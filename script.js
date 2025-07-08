@@ -28,7 +28,7 @@ function typeLine() {
       if (window.scrollY < 50) {
         document.getElementById('main-content').scrollIntoView({ behavior: 'smooth' });
       }
-    }, 2500);
+    }, 1000);
   }
 }
 typeLine();
@@ -43,12 +43,33 @@ document.getElementById('hero').addEventListener('click', () => {
   }
 });
 
+// Typewriter effect for about paragraph
+let aboutTypewriterStarted = false;
+function typeAboutParagraph() {
+  const aboutEl = document.getElementById('about-typewriter');
+  const text = 'When I’m not working, you’ll find me traveling, scuba diving, off-roading, or learning something new. Travel keeps me curious and connected.';
+  let idx = 0;
+  aboutEl.textContent = '';
+  function typeChar() {
+    if (idx < text.length) {
+      aboutEl.textContent += text[idx++];
+      setTimeout(typeChar, 32);
+    }
+  }
+  typeChar();
+}
+
 // Fade-in on scroll
 function revealOnScroll() {
   document.querySelectorAll('.fade-in').forEach(el => {
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight - 60) {
       el.classList.add('visible');
+      // Trigger about typewriter when about section is visible
+      if (!aboutTypewriterStarted && el.id === 'about') {
+        aboutTypewriterStarted = true;
+        typeAboutParagraph();
+      }
     }
   });
 }
