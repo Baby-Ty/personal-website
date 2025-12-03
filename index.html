@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyler Stewart | Engineer. Builder. Explorer.</title>
+    <meta name="description" content="Tyler Stewart - AI, automation, and solutions engineering. Building practical systems that help teams work faster and remove unnecessary friction.">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tyler Stewart | Engineer. Builder. Explorer.">
+    <meta property="og:description" content="AI, automation, and solutions engineering. Building practical systems that help teams work faster.">
+    <meta property="og:url" content="https://tylerstewart.co.za/">
+    <meta property="og:image" content="https://tylerstewart.co.za/og-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Global Background -->
+    <canvas id="matrix-hero-bg" class="matrix-hero-bg"></canvas>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="buttons">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <div class="terminal-title">terminal</div>
+            </div>
+            <div class="terminal-body" id="terminal-content">
+                <!-- Content will be injected by script.js -->
+                <div class="line">
+                    <span class="prompt">tyler@ai:~$</span> <span id="typewriter"></span><span class="cursor"
+                        id="terminal-cursor">█</span>
+                </div>
+            </div>
+        </div>
+        <button id="scroll-down" aria-label="Scroll Down">
+            ↓
+        </button>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <div class="dots-bg"></div>
+
+        <!-- About Me -->
+        <section class="section fade-in" id="about">
+            <h2>About Me</h2>
+            <div class="split-layout">
+                <div class="image-container left">
+                    <img src="Untitled design(8).png" alt="Tyler Stewart" loading="lazy">
+                </div>
+                <div class="text-container">
+                    <p class="intro-text">
+                        Howzit, I'm Tyler. I focus on AI, automation, and practical problem-solving.
+                    </p>
+                    <p>
+                        I like taking slow or messy processes and turning them into simple and reliable systems. The
+                        automations
+                        and tools I have built bring in more than $5,000 in monthly recurring value, help teams work
+                        faster, and
+                        remove a lot of unnecessary friction.
+                    </p>
+                    <p>
+                        I care about clarity, speed, and building things that actually help people. No over-engineering.
+                        No
+                        noise. Just clean solutions that make work easier.
+                    </p>
+                    <p id="about-typewriter" class="highlight-text"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Focus Areas -->
+        <section class="section fade-in" id="focus">
+            <h2>What I Focus On</h2>
+            <div class="cards">
+                <div class="card fade-in delay-1">
+                    <h3>AI and Automation</h3>
+                    <p>Smart workflows, agentic tools, and lightweight automations that cut busywork and improve
+                        efficiency.</p>
+                </div>
+                <div class="card fade-in delay-2">
+                    <h3>Solutions Engineering</h3>
+                    <p>Simple and practical systems that actually fix problems. Better customer experience, smoother
+                        workflows, and internal tools that make work feel lighter.</p>
+                </div>
+                <div class="card fade-in delay-3">
+                    <h3>Process and Productivity</h3>
+                    <p>Cleaning up noisy processes, removing blockers, and helping teams use technology in a way that
+                        feels natural and effective.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Side Project -->
+        <section class="section fade-in" id="projects">
+            <h2>Side Project</h2>
+            <div class="project-card split-layout-card">
+                <div class="project-content">
+                    <h3>🌍 South Bound</h3>
+                    <p>A simple way to plan long stays in amazing cities. Work where you want, live how you like, and
+                        skip the stress that usually comes with travel.</p>
+                    <a href="https://www.southbnd.co.za/" class="project-link" target="_blank" rel="noopener noreferrer">→ Visit Website</a>
+                </div>
+                <div class="image-container right">
+                    <img src="P7090043.JPG" alt="South Bound Project" loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <!-- What Drives Me -->
+        <section class="section fade-in" id="values">
+            <h2>What Drives Me</h2>
+            <p class="intro-text" style="margin-bottom: 3rem;">
+                I believe in building a life that allows for exploration and continuous improvement. These core values
+                guide my work and my downtime.
+            </p>
+            <div class="values-grid">
+                <div class="value-card fade-in delay-1">
+                    <div class="value-icon">🗽</div>
+                    <h3>Freedom</h3>
+                    <p>Autonomy to choose where and how I work, building a life on my own terms.</p>
+                </div>
+                <div class="value-card fade-in delay-2">
+                    <div class="value-icon">🌍</div>
+                    <h3>Adventure</h3>
+                    <p>Exploring new places, ideas, and challenges that push me outside my comfort zone.</p>
+                </div>
+                <div class="value-card fade-in delay-3">
+                    <div class="value-icon">📈</div>
+                    <h3>Growth</h3>
+                    <p>Continuous learning and skill development, always becoming a better version of myself.</p>
+                </div>
+                <div class="value-card fade-in delay-4">
+                    <div class="value-icon">⚡</div>
+                    <h3>Discipline</h3>
+                    <p>Consistent habits and focused execution that compound over time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer fade-in" id="footer">
+            <div class="footer-content">
+                <h2>Let's Connect</h2>
+                <p>Always open to discussing new ideas, automation strategies, or just tech in general.</p>
+
+                <div class="footer-links">
+                    <a href="mailto:email@tylerstewart.co.za" class="footer-link">Email</a>
+                    <a href="https://www.linkedin.com/in/tylerstewartza/" class="footer-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                    <a href="https://www.southbnd.co.za/" class="footer-link" target="_blank" rel="noopener noreferrer">South Bound</a>
+                </div>
+                <div class="footer-bottom">
+                    <p class="copyright">&copy; 2025 Tyler Stewart</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
