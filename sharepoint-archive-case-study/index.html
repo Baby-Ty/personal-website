@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SharePoint Archive Automation with Claude — Tyler Stewart</title>
+<meta name="description" content="How a 1TB SharePoint site was archived using a custom PowerShell script built with Claude in about an hour. Zero files lost.">
+
+<!-- Open Graph / Social -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="SharePoint Archive Automation with Claude">
+<meta property="og:description" content="How a 1TB SharePoint site was archived using a custom PowerShell script built with Claude in about an hour. Zero files lost.">
+<meta property="og:url" content="https://tylerstewart.co.za/sharepoint-archive-case-study">
+<meta property="og:image" content="https://tylerstewart.co.za/sharepoint-archive-case-study/screenshot-1.png">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WQVB68P7W1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-WQVB68P7W1');
+</script>
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #D92037;
+    --primary-dim: #FFF0F2;
+    --bg-page: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --bg-dark: #111111;
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --radius: 12px;
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-main);
+    background: var(--bg-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  h1, h2, h3 { font-weight: 600; color: var(--bg-dark); letter-spacing: -0.02em; }
+  h1 { font-size: 44px; line-height: 1.1; margin-bottom: 16px; }
+  h2 { font-size: 28px; margin-bottom: 20px; }
+  h3 { font-size: 18px; margin-top: 40px; margin-bottom: 10px; }
+
+  p { margin-bottom: 20px; color: #374151; font-size: 16px; line-height: 1.75; }
+  p:last-child { margin-bottom: 0; }
+  strong { font-weight: 600; color: #111; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 14px;
+    display: inline-block;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    background: #1E1E1E;
+    border: 1px solid #404040;
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #E5E7EB;
+  }
+
+  /* COVER */
+  .cover {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 64px 56px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(200,16,46,0.15) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+  }
+
+  .cover-content { position: relative; z-index: 10; }
+  .cover h1 { color: white; }
+  .cover h1 strong { color: white; font-weight: 700; }
+
+  .cover-intro {
+    font-size: 18px;
+    color: #D1D5DB;
+    max-width: 540px;
+    font-weight: 300;
+    line-height: 1.65;
+    margin-bottom: 52px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 36px;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 6px;
+  }
+  .stat-value span { color: var(--primary); margin-left: 2px; }
+  .stat-label { font-size: 12px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .cover-meta {
+    margin-top: 52px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6B7280;
+  }
+
+  /* CONTENT */
+  .content { padding: 0 48px 72px; }
+
+  .section {
+    margin-top: 72px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+  }
+  .section:first-child { margin-top: 56px; border-top: none; padding-top: 0; }
+
+  /* OPTION CARDS */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .option-card {
+    background: #FAFAFA;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .option-card.chosen {
+    border-color: var(--primary);
+    background: var(--primary-dim);
+  }
+
+  .option-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .option-card.chosen .option-name {
+    color: var(--primary);
+    border-bottom-color: rgba(217,32,55,0.2);
+  }
+
+  .option-verdict {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 8px;
+  }
+
+  .option-card.chosen .option-verdict {
+    color: var(--primary);
+  }
+
+  .option-reason {
+    font-size: 13px;
+    color: #6B7280;
+    line-height: 1.6;
+  }
+
+  .option-reason ul {
+    margin: 8px 0 8px 16px;
+    list-style: disc;
+  }
+
+  .option-reason li {
+    margin-bottom: 4px;
+  }
+
+  /* TERMINAL CARDS */
+  .card-window {
+    background: #2D2D2D;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    margin: 24px 0;
+  }
+
+  .card-header {
+    background: #1E1E1E;
+    padding: 10px 16px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+  .dot.active { background: #D92037; }
+
+  .card-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-left: 8px;
+  }
+
+  .card-body {
+    padding: 22px 24px;
+    font-size: 14px;
+    background: #0D0D0D;
+    color: #E5E7EB;
+  }
+
+  .card-note {
+    padding: 10px 24px;
+    background: #1A1A1A;
+    border-top: 1px solid #333;
+    font-size: 13px;
+    color: #D1D5DB;
+    font-family: var(--font-sans);
+    font-style: italic;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    color: inherit;
+  }
+
+  /* STEP LIST */
+  .step-list {
+    list-style: none;
+    margin: 24px 0;
+  }
+
+  .step-list li {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-dim);
+    border: 1px solid rgba(217,32,55,0.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 15px;
+    color: #374151;
+    line-height: 1.65;
+  }
+
+  .step-text strong { color: #111; }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--primary-dim);
+    border-left: 4px solid var(--primary);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 24px 0;
+    color: #4B5563;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* OUTCOME GRID */
+  .outcome-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .outcome-card {
+    background: #FAFAFA;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .outcome-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .outcome-value {
+    font-size: 15px;
+    color: #111;
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  .footer {
+    background: #F9FAFB;
+    padding: 28px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* EXPANDABLE SCRIPT */
+  .script-window {
+    background: #0D0D0D;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 24px 0;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  }
+
+  .script-header {
+    background: #1a1a1a;
+    padding: 10px 16px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .script-header-left { display: flex; align-items: center; gap: 8px; }
+
+  .script-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-left: 8px;
+  }
+
+  .script-body {
+    position: relative;
+  }
+
+  .script-preview {
+    padding: 20px 24px 0;
+  }
+
+  .script-hidden {
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.2s ease;
+  }
+
+  .script-hidden.open {
+    max-height: 2000px;
+    padding: 0 24px 20px;
+  }
+
+  .script-preview pre,
+  .script-hidden pre {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #E5E7EB;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .script-fade {
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, #0D0D0D);
+    margin-top: -60px;
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+  }
+
+  .script-fade.hidden { opacity: 0; pointer-events: none; }
+
+  .expand-bar {
+    padding: 12px 24px;
+    background: #141414;
+    border-top: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #9CA3AF;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .expand-bar:hover { background: #1E1E1E; color: #E5E7EB; }
+
+  .expand-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 10px;
+  }
+
+  .expand-arrow.open { transform: rotate(180deg); }
+
+  /* syntax colours */
+  .ps-comment { color: #6A9955; }
+  .ps-param   { color: #9CDCFE; }
+  .ps-keyword { color: #C586C0; }
+  .ps-string  { color: #CE9178; }
+  .ps-func    { color: #DCDCAA; }
+  .ps-type    { color: #4EC9B0; }
+  .ps-var     { color: #9CDCFE; }
+  .ps-op      { color: #D4D4D4; }
+
+  @media (max-width: 680px) {
+    .container { margin: 0; border-radius: 0; }
+    .cover { padding: 40px 24px; }
+    .content { padding: 0 24px 56px; }
+    .stats-grid, .options-grid, .outcome-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    .footer { padding: 24px; flex-direction: column; gap: 8px; }
+    .screenshots-pair { grid-template-columns: 1fr; }
+  }
+
+  /* SCREENSHOTS */
+  .screenshots-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 40px;
+    background: #111;
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .screenshot-frame {
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    height: 280px;
+  }
+
+  .screenshot-frame img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+    cursor: zoom-in;
+  }
+
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.8);
+    cursor: default;
+  }
+
+  .screenshot-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #4B5563;
+    margin-top: 10px;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="cover-content">
+      <div class="eyebrow">Internal · Case Study</div>
+      <h1>SharePoint Archive Automation<br><strong>with Claude</strong></h1>
+      <p class="cover-intro">A SharePoint site had grown to 1TB across 840 folders.<br><span style="white-space: nowrap;">Claude helped build the script and turn it into a reusable tool.</span></p>
+
+      <div class="stats-grid">
+        <div>
+          <div class="stat-value">$8<span>500</span></div>
+          <div class="stat-label">Project value</div>
+        </div>
+        <div>
+          <div class="stat-value">~1<span>h</span></div>
+          <div class="stat-label">Script built in</div>
+        </div>
+        <div>
+          <div class="stat-value">1<span>TB</span></div>
+          <div class="stat-label">Data archived</div>
+        </div>
+        <div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Files lost</div>
+        </div>
+      </div>
+
+      <div class="cover-meta">
+        <div>Tyler Stewart · Netsurit · March 2026</div>
+        <div>SharePoint → SharePoint · Graph API · PowerShell</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- PROBLEM -->
+    <section class="section">
+      <div class="eyebrow">The Problem</div>
+      <h2>Archiving a growing SharePoint site</h2>
+      <p>A client's SharePoint site had grown to around 1TB across roughly 840 folders. Completed projects sat alongside active ones, and the library was becoming harder to navigate.</p>
+      <p>The goal wasn't to migrate the entire site. Older content needed to move to an archive site so the working library stayed focused on active projects.</p>
+      <p>The rule was simple: files not modified in the last 12 months move to a new SharePoint archive site in the same tenant.</p>
+    </section>
+
+    <!-- OPTIONS -->
+    <section class="section">
+      <div class="eyebrow">Approach</div>
+      <h2>Options considered</h2>
+      <p>The obvious approaches were reviewed.</p>
+
+      <div class="options-grid">
+        <div class="option-card">
+          <div class="option-name">SharePoint Migration Tool</div>
+          <div class="option-verdict">Wrong tool</div>
+          <div class="option-reason">SPMT is designed mainly for file share ingestion and on-prem SharePoint migrations. This job was same-tenant, site-to-site, which SPMT does not handle well.</div>
+        </div>
+        <div class="option-card">
+          <div class="option-name">Third-party SaaS</div>
+          <div class="option-verdict">Too expensive</div>
+          <div class="option-reason">Tools like ShareGate and Metalogix handle migrations well, but licensing costs are difficult to justify for a one-off archive project.</div>
+        </div>
+        <div class="option-card chosen">
+          <div class="option-name">Custom script ✓</div>
+          <div class="option-verdict">Right fit</div>
+          <div class="option-reason">Both sites were in the same tenant, and the Graph API already exposes everything needed. Using PowerShell with PnP.PowerShell made it possible to:
+            <ul>
+              <li>Identify files not modified in the last 12 months</li>
+              <li>Copy them to the archive site</li>
+              <li>Verify the copy before removing the source</li>
+            </ul>
+            A dry-run mode ensured nothing touched production until the process was confirmed correct.
+          </div>
+        </div>
+      </div>
+
+      <p>A script was the best fit. Graph supports same-tenant moves, and PnP.PowerShell provides the commands to copy, verify, and delete safely.</p>
+    </section>
+
+    <!-- BUILD -->
+    <section class="section">
+      <div class="eyebrow">Build</div>
+      <h2>Building it with Claude</h2>
+      <p>The script was built with Claude.</p>
+
+      <p>The process was simple: describe the problem clearly and provide the right context for the PnP.PowerShell module.</p>
+
+      <p>The first prompt asked Claude to outline a safe archive process. Once that structure was clear, the script was filled in and refined.</p>
+
+      <p>Within about an hour the script could archive older files while leaving active project work untouched.</p>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="card-title">Initial prompt — structure first</div>
+        </div>
+        <div class="card-body">
+<pre>We are building a PowerShell script that archives files from one SharePoint
+site to another in the same tenant using PnP.PowerShell.
+
+Requirements:
+- Source site: /sites/projects
+- Destination site: /sites/archive
+- Only archive files not modified in the last 12 months
+- Copy files first
+- Verify the copy succeeded
+- Generate a deletion report showing what would be removed
+- Wait for user confirmation before deleting anything
+- Dry-run mode by default
+- Log each operation with timestamp to console and CSV
+- Stop and report if verification fails, never delete unverified files
+
+Before writing the script, outline the workflow for this process.</pre>
+        </div>
+        <div class="card-note">Starting with the workflow helped define the safety checks before writing any code.</div>
+      </div>
+
+      <h3>Script 1 — Copy</h3>
+      <p>Connects to both sites, queries files not modified in the last 12 months using a date filter, and copies them to the archive. Dry-run by default.</p>
+
+      <div class="script-window">
+        <div class="script-header">
+          <div class="script-header-left">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="script-title">SharePointArchiveCopy.ps1</div>
+          </div>
+          <span class="tag">PnP.PowerShell</span>
+        </div>
+        <div class="script-body">
+          <div class="script-preview">
+<pre><span class="ps-keyword">param</span>(
+    [<span class="ps-type">string</span>]<span class="ps-param">$ClientId</span>           = <span class="ps-string">"a7f2e1b4-9c3d-4e8f-b5a6-2d1c7e9f0b3a"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$SourceSite</span>         = <span class="ps-string">"https://contoso.sharepoint.com/sites/RentalFiles"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$DestinationSite</span>    = <span class="ps-string">"https://contoso.sharepoint.com/sites/ContosoArchive"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$SourceLibrary</span>      = <span class="ps-string">"Shared Documents"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$DestinationLibrary</span> = <span class="ps-string">"Archive"</span>,
+    [<span class="ps-type">int</span>]   <span class="ps-param">$OlderThanDays</span>      = 365,
+    [<span class="ps-type">bool</span>]  <span class="ps-param">$DryRun</span>             = <span class="ps-op">$true</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$LogPath</span>            = <span class="ps-string">".\SharePointArchiveLog.csv"</span>
+)</pre>
+          </div>
+          <div class="script-hidden" id="scriptCopyFull">
+<pre>
+<span class="ps-keyword">function</span> <span class="ps-func">Write-Log</span> {
+    <span class="ps-keyword">param</span>([<span class="ps-type">string</span>]<span class="ps-param">$Action</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Status</span>, [<span class="ps-type">string</span>]<span class="ps-param">$SourceUrl</span>,
+          [<span class="ps-type">string</span>]<span class="ps-param">$TargetUrl</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Modified</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Message</span>)
+    [<span class="ps-type">PSCustomObject</span>]@{
+        Timestamp = (<span class="ps-func">Get-Date</span>).ToString(<span class="ps-string">"yyyy-MM-dd HH:mm:ss"</span>)
+        Action    = <span class="ps-param">$Action</span>; Status = <span class="ps-param">$Status</span>; SourceUrl = <span class="ps-param">$SourceUrl</span>
+        TargetUrl = <span class="ps-param">$TargetUrl</span>; Modified = <span class="ps-param">$Modified</span>; Message = <span class="ps-param">$Message</span>
+    } | <span class="ps-func">Export-Csv</span> <span class="ps-op">-Path</span> <span class="ps-param">$LogPath</span> <span class="ps-op">-NoTypeInformation</span> <span class="ps-op">-Append</span> <span class="ps-op">-Encoding</span> UTF8
+}
+
+<span class="ps-keyword">function</span> <span class="ps-func">Ensure-FolderPath</span> {
+    <span class="ps-keyword">param</span>([<span class="ps-type">string</span>]<span class="ps-param">$LibraryName</span>, [<span class="ps-type">string</span>]<span class="ps-param">$FolderPathRelativeToLibrary</span>, <span class="ps-param">$Connection</span>)
+    <span class="ps-keyword">if</span> ([<span class="ps-type">string</span>]::IsNullOrWhiteSpace(<span class="ps-param">$FolderPathRelativeToLibrary</span>)) { <span class="ps-keyword">return</span> }
+    <span class="ps-param">$parts</span> = <span class="ps-param">$FolderPathRelativeToLibrary</span> <span class="ps-op">-split</span> <span class="ps-string">"/"</span>
+    <span class="ps-param">$currentPath</span> = <span class="ps-string">""</span>
+    <span class="ps-keyword">foreach</span> (<span class="ps-param">$part</span> <span class="ps-keyword">in</span> <span class="ps-param">$parts</span>) {
+        <span class="ps-keyword">if</span> ([<span class="ps-type">string</span>]::IsNullOrWhiteSpace(<span class="ps-param">$part</span>)) { <span class="ps-keyword">continue</span> }
+        <span class="ps-param">$parentPath</span>  = <span class="ps-param">$currentPath</span>
+        <span class="ps-param">$currentPath</span> = <span class="ps-keyword">if</span> (<span class="ps-param">$currentPath</span>) { <span class="ps-string">"$currentPath/$part"</span> } <span class="ps-keyword">else</span> { <span class="ps-param">$part</span> }
+        <span class="ps-param">$folderUrl</span>   = <span class="ps-string">"$LibraryName/$currentPath"</span>
+        <span class="ps-keyword">try</span> { <span class="ps-func">Get-PnPFolder</span> <span class="ps-op">-Url</span> <span class="ps-param">$folderUrl</span> <span class="ps-op">-Connection</span> <span class="ps-param">$Connection</span> <span class="ps-op">-ErrorAction</span> Stop | <span class="ps-func">Out-Null</span> }
+        <span class="ps-keyword">catch</span> {
+            <span class="ps-param">$parent</span> = <span class="ps-keyword">if</span> (<span class="ps-param">$parentPath</span>) { <span class="ps-string">"$LibraryName/$parentPath"</span> } <span class="ps-keyword">else</span> { <span class="ps-param">$LibraryName</span> }
+            <span class="ps-func">Add-PnPFolder</span> <span class="ps-op">-Name</span> <span class="ps-param">$part</span> <span class="ps-op">-Folder</span> <span class="ps-param">$parent</span> <span class="ps-op">-Connection</span> <span class="ps-param">$Connection</span> | <span class="ps-func">Out-Null</span>
+        }
+    }
+}
+
+<span class="ps-keyword">if</span> (<span class="ps-func">Test-Path</span> <span class="ps-param">$LogPath</span>) { <span class="ps-func">Remove-Item</span> <span class="ps-param">$LogPath</span> <span class="ps-op">-Force</span> }
+
+<span class="ps-param">$sourceUri</span>          = [<span class="ps-type">System.Uri</span>]<span class="ps-param">$SourceSite</span>
+<span class="ps-param">$destUri</span>            = [<span class="ps-type">System.Uri</span>]<span class="ps-param">$DestinationSite</span>
+<span class="ps-param">$sourceLibraryRoot</span>  = <span class="ps-string">"$($sourceUri.AbsolutePath.TrimEnd('/'))/$SourceLibrary"</span>
+<span class="ps-param">$destLibraryRoot</span>    = <span class="ps-string">"$($destUri.AbsolutePath.TrimEnd('/'))/$DestinationLibrary"</span>
+<span class="ps-param">$cutoff</span>             = (<span class="ps-func">Get-Date</span>).AddDays(-<span class="ps-param">$OlderThanDays</span>).ToUniversalTime().ToString(<span class="ps-string">"yyyy-MM-ddTHH:mm:ssZ"</span>)
+
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Connecting to source site..."</span>
+<span class="ps-param">$SourceConn</span> = <span class="ps-func">Connect-PnPOnline</span> <span class="ps-op">-Url</span> <span class="ps-param">$SourceSite</span> <span class="ps-op">-ClientId</span> <span class="ps-param">$ClientId</span> <span class="ps-op">-Interactive</span> <span class="ps-op">-ReturnConnection</span>
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Connecting to destination site..."</span>
+<span class="ps-param">$DestConn</span>   = <span class="ps-func">Connect-PnPOnline</span> <span class="ps-op">-Url</span> <span class="ps-param">$DestinationSite</span> <span class="ps-op">-ClientId</span> <span class="ps-param">$ClientId</span> <span class="ps-op">-Interactive</span> <span class="ps-op">-ReturnConnection</span>
+
+<span class="ps-param">$camlQuery</span> = <span class="ps-string">@"
+&lt;View Scope='RecursiveAll'&gt;&lt;Query&gt;&lt;Where&gt;&lt;And&gt;
+  &lt;Eq&gt;&lt;FieldRef Name='FSObjType'/&gt;&lt;Value Type='Integer'&gt;0&lt;/Value&gt;&lt;/Eq&gt;
+  &lt;Lt&gt;&lt;FieldRef Name='Modified'/&gt;&lt;Value Type='DateTime' IncludeTimeValue='TRUE'&gt;$cutoff&lt;/Value&gt;&lt;/Lt&gt;
+&lt;/And&gt;&lt;/Where&gt;&lt;/Query&gt;&lt;RowLimit Paged='TRUE'&gt;2000&lt;/RowLimit&gt;&lt;/View&gt;
+"@</span>
+
+<span class="ps-param">$items</span> = <span class="ps-func">Get-PnPListItem</span> <span class="ps-op">-List</span> <span class="ps-param">$SourceLibrary</span> <span class="ps-op">-Query</span> <span class="ps-param">$camlQuery</span> <span class="ps-op">-PageSize</span> 2000 <span class="ps-op">-Connection</span> <span class="ps-param">$SourceConn</span>
+
+<span class="ps-keyword">if</span> (-<span class="ps-op">not</span> <span class="ps-param">$items</span> -<span class="ps-op">or</span> <span class="ps-param">$items</span>.Count <span class="ps-op">-eq</span> 0) {
+    <span class="ps-func">Write-Host</span> <span class="ps-string">"No matching files found."</span>; <span class="ps-keyword">return</span>
+}
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Found $($items.Count) file(s) older than $OlderThanDays days."</span>
+
+<span class="ps-keyword">foreach</span> (<span class="ps-param">$item</span> <span class="ps-keyword">in</span> <span class="ps-param">$items</span>) {
+    <span class="ps-param">$sourceUrl</span> = <span class="ps-param">$item</span>[<span class="ps-string">"FileRef"</span>]; <span class="ps-param">$modified</span> = <span class="ps-param">$item</span>[<span class="ps-string">"Modified"</span>]
+    <span class="ps-keyword">if</span> ([<span class="ps-type">string</span>]::IsNullOrWhiteSpace(<span class="ps-param">$sourceUrl</span>)) { <span class="ps-keyword">continue</span> }
+
+    <span class="ps-param">$relPath</span>     = <span class="ps-param">$sourceUrl</span> <span class="ps-op">-replace</span> <span class="ps-string">"^$([regex]::Escape($sourceLibraryRoot))/?",""</span>
+    <span class="ps-param">$folderRel</span>   = (<span class="ps-func">Split-Path</span> <span class="ps-param">$relPath</span> <span class="ps-op">-Parent</span>) <span class="ps-op">-replace</span> <span class="ps-string">"\\/","/"</span>
+    <span class="ps-keyword">if</span> (<span class="ps-param">$folderRel</span> <span class="ps-op">-eq</span> <span class="ps-string">"."</span>) { <span class="ps-param">$folderRel</span> = <span class="ps-string">""</span> }
+    <span class="ps-param">$targetUrl</span>   = <span class="ps-keyword">if</span> (<span class="ps-param">$folderRel</span>) { <span class="ps-string">"$destLibraryRoot/$folderRel"</span> } <span class="ps-keyword">else</span> { <span class="ps-param">$destLibraryRoot</span> }
+
+    <span class="ps-keyword">if</span> (<span class="ps-param">$DryRun</span>) {
+        <span class="ps-func">Write-Host</span> <span class="ps-string">"[DRY RUN] $sourceUrl → $targetUrl"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Copy <span class="ps-op">-Status</span> DryRun <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-TargetUrl</span> <span class="ps-param">$targetUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-string">"Planned copy only"</span>
+        <span class="ps-keyword">continue</span>
+    }
+
+    <span class="ps-keyword">try</span> {
+        <span class="ps-keyword">if</span> (<span class="ps-param">$folderRel</span>) { <span class="ps-func">Ensure-FolderPath</span> <span class="ps-op">-LibraryName</span> <span class="ps-param">$DestinationLibrary</span> <span class="ps-op">-FolderPathRelativeToLibrary</span> <span class="ps-param">$folderRel</span> <span class="ps-op">-Connection</span> <span class="ps-param">$DestConn</span> }
+        <span class="ps-func">Copy-PnPFile</span> <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-TargetUrl</span> <span class="ps-param">$targetUrl</span> <span class="ps-op">-Force</span> <span class="ps-op">-Connection</span> <span class="ps-param">$SourceConn</span>
+        <span class="ps-func">Write-Host</span> <span class="ps-string">"[OK] $sourceUrl"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Copy <span class="ps-op">-Status</span> Success <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-TargetUrl</span> <span class="ps-param">$targetUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-string">"Copied successfully"</span>
+    } <span class="ps-keyword">catch</span> {
+        <span class="ps-func">Write-Warning</span> <span class="ps-string">"[FAILED] $sourceUrl :: $($_.Exception.Message)"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Copy <span class="ps-op">-Status</span> Failed <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-TargetUrl</span> <span class="ps-param">$targetUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-param">$_</span>.Exception.Message
+    }
+}
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Done. Log: $LogPath"</span></pre>
+          </div>
+          <div class="script-fade" id="scriptCopyFade"></div>
+        </div>
+        <div class="expand-bar" onclick="toggleScript('scriptCopyFull','scriptCopyFade','copyLabel','copyArrow')">
+          <span id="copyLabel">Show full script</span>
+          <span class="expand-arrow" id="copyArrow">▼</span>
+        </div>
+      </div>
+
+      <h3>Script 2 — Verify &amp; Delete</h3>
+      <p>Runs after the copy is complete. Re-queries the same date filter, confirms each file exists at the destination before removing the source. Dry-run by default.</p>
+
+      <div class="script-window">
+        <div class="script-header">
+          <div class="script-header-left">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="script-title">SharePointVerifyDelete.ps1</div>
+          </div>
+          <span class="tag">PnP.PowerShell</span>
+        </div>
+        <div class="script-body">
+          <div class="script-preview">
+<pre><span class="ps-keyword">param</span>(
+    [<span class="ps-type">string</span>]<span class="ps-param">$ClientId</span>           = <span class="ps-string">"a7f2e1b4-9c3d-4e8f-b5a6-2d1c7e9f0b3a"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$SourceSite</span>         = <span class="ps-string">"https://contoso.sharepoint.com/sites/RentalFiles"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$DestinationSite</span>    = <span class="ps-string">"https://contoso.sharepoint.com/sites/ContosoArchive"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$SourceLibrary</span>      = <span class="ps-string">"Shared Documents"</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$DestinationLibrary</span> = <span class="ps-string">"Archive"</span>,
+    [<span class="ps-type">int</span>]   <span class="ps-param">$OlderThanDays</span>      = 365,
+    [<span class="ps-type">bool</span>]  <span class="ps-param">$DryRun</span>             = <span class="ps-op">$true</span>,
+    [<span class="ps-type">string</span>]<span class="ps-param">$LogPath</span>            = <span class="ps-string">".\SharePointDeleteVerifiedLog_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"</span>
+)</pre>
+          </div>
+          <div class="script-hidden" id="scriptDeleteFull">
+<pre>
+<span class="ps-keyword">function</span> <span class="ps-func">Write-Log</span> {
+    <span class="ps-keyword">param</span>([<span class="ps-type">string</span>]<span class="ps-param">$Action</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Status</span>, [<span class="ps-type">string</span>]<span class="ps-param">$SourceUrl</span>,
+          [<span class="ps-type">string</span>]<span class="ps-param">$DestinationUrl</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Modified</span>, [<span class="ps-type">string</span>]<span class="ps-param">$Message</span>)
+    [<span class="ps-type">PSCustomObject</span>]@{
+        Timestamp      = (<span class="ps-func">Get-Date</span>).ToString(<span class="ps-string">"yyyy-MM-dd HH:mm:ss"</span>)
+        Action         = <span class="ps-param">$Action</span>; Status = <span class="ps-param">$Status</span>; SourceUrl = <span class="ps-param">$SourceUrl</span>
+        DestinationUrl = <span class="ps-param">$DestinationUrl</span>; Modified = <span class="ps-param">$Modified</span>; Message = <span class="ps-param">$Message</span>
+    } | <span class="ps-func">Export-Csv</span> <span class="ps-op">-Path</span> <span class="ps-param">$LogPath</span> <span class="ps-op">-NoTypeInformation</span> <span class="ps-op">-Append</span> <span class="ps-op">-Encoding</span> UTF8
+}
+
+<span class="ps-keyword">function</span> <span class="ps-func">Test-DestinationFileExists</span> {
+    <span class="ps-keyword">param</span>([<span class="ps-type">string</span>]<span class="ps-param">$DestinationFileUrl</span>, <span class="ps-param">$Connection</span>)
+    <span class="ps-keyword">try</span>   { <span class="ps-func">Get-PnPFile</span> <span class="ps-op">-Url</span> <span class="ps-param">$DestinationFileUrl</span> <span class="ps-op">-AsListItem</span> <span class="ps-op">-Connection</span> <span class="ps-param">$Connection</span> <span class="ps-op">-ErrorAction</span> Stop | <span class="ps-func">Out-Null</span>; <span class="ps-keyword">return</span> <span class="ps-op">$true</span> }
+    <span class="ps-keyword">catch</span> { <span class="ps-keyword">return</span> <span class="ps-op">$false</span> }
+}
+
+<span class="ps-param">$SourceConn</span> = <span class="ps-func">Connect-PnPOnline</span> <span class="ps-op">-Url</span> <span class="ps-param">$SourceSite</span>      <span class="ps-op">-ClientId</span> <span class="ps-param">$ClientId</span> <span class="ps-op">-Interactive</span> <span class="ps-op">-ReturnConnection</span>
+<span class="ps-param">$DestConn</span>   = <span class="ps-func">Connect-PnPOnline</span> <span class="ps-op">-Url</span> <span class="ps-param">$DestinationSite</span> <span class="ps-op">-ClientId</span> <span class="ps-param">$ClientId</span> <span class="ps-op">-Interactive</span> <span class="ps-op">-ReturnConnection</span>
+
+<span class="ps-param">$sourceLibraryRoot</span> = <span class="ps-string">"$([System.Uri]$SourceSite).AbsolutePath.TrimEnd('/'))/$SourceLibrary"</span>
+<span class="ps-param">$destLibraryRoot</span>   = <span class="ps-string">"$([System.Uri]$DestinationSite).AbsolutePath.TrimEnd('/'))/$DestinationLibrary"</span>
+<span class="ps-param">$cutoff</span>            = (<span class="ps-func">Get-Date</span>).AddDays(-<span class="ps-param">$OlderThanDays</span>).ToUniversalTime().ToString(<span class="ps-string">"yyyy-MM-ddTHH:mm:ssZ"</span>)
+
+<span class="ps-param">$camlQuery</span> = <span class="ps-string">@"
+&lt;View Scope='RecursiveAll'&gt;&lt;Query&gt;&lt;Where&gt;&lt;And&gt;
+  &lt;Eq&gt;&lt;FieldRef Name='FSObjType'/&gt;&lt;Value Type='Integer'&gt;0&lt;/Value&gt;&lt;/Eq&gt;
+  &lt;Lt&gt;&lt;FieldRef Name='Modified'/&gt;&lt;Value Type='DateTime' IncludeTimeValue='TRUE'&gt;$cutoff&lt;/Value&gt;&lt;/Lt&gt;
+&lt;/And&gt;&lt;/Where&gt;&lt;/Query&gt;&lt;RowLimit Paged='TRUE'&gt;2000&lt;/RowLimit&gt;&lt;/View&gt;
+"@</span>
+
+<span class="ps-param">$items</span> = <span class="ps-func">Get-PnPListItem</span> <span class="ps-op">-List</span> <span class="ps-param">$SourceLibrary</span> <span class="ps-op">-Query</span> <span class="ps-param">$camlQuery</span> <span class="ps-op">-PageSize</span> 2000 <span class="ps-op">-Connection</span> <span class="ps-param">$SourceConn</span>
+<span class="ps-keyword">if</span> (-<span class="ps-op">not</span> <span class="ps-param">$items</span> -<span class="ps-op">or</span> <span class="ps-param">$items</span>.Count <span class="ps-op">-eq</span> 0) { <span class="ps-func">Write-Host</span> <span class="ps-string">"No matching files found."</span>; <span class="ps-keyword">return</span> }
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Found $($items.Count) file(s). Processing..."</span>
+
+<span class="ps-param">$counter</span> = 0
+<span class="ps-keyword">foreach</span> (<span class="ps-param">$item</span> <span class="ps-keyword">in</span> <span class="ps-param">$items</span>) {
+    <span class="ps-param">$counter</span>++
+    <span class="ps-func">Write-Host</span> <span class="ps-string">"$counter / $($items.Count)"</span>
+    <span class="ps-param">$sourceUrl</span> = <span class="ps-param">$item</span>[<span class="ps-string">"FileRef"</span>]; <span class="ps-param">$modified</span> = <span class="ps-param">$item</span>[<span class="ps-string">"Modified"</span>]
+    <span class="ps-keyword">if</span> ([<span class="ps-type">string</span>]::IsNullOrWhiteSpace(<span class="ps-param">$sourceUrl</span>)) { <span class="ps-keyword">continue</span> }
+
+    <span class="ps-param">$relPath</span>    = (<span class="ps-param">$sourceUrl</span> <span class="ps-op">-replace</span> <span class="ps-string">"^$([regex]::Escape($sourceLibraryRoot))/?",""</span>) <span class="ps-op">-replace</span> <span class="ps-string">"\\/","/"</span>
+    <span class="ps-param">$destFileUrl</span> = <span class="ps-string">"$destLibraryRoot/$relPath"</span>
+
+    <span class="ps-keyword">if</span> (-<span class="ps-op">not</span> (<span class="ps-func">Test-DestinationFileExists</span> <span class="ps-op">-DestinationFileUrl</span> <span class="ps-param">$destFileUrl</span> <span class="ps-op">-Connection</span> <span class="ps-param">$DestConn</span>)) {
+        <span class="ps-func">Write-Warning</span> <span class="ps-string">"[SKIPPED] Destination not found: $sourceUrl"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Delete <span class="ps-op">-Status</span> Skipped <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-DestinationUrl</span> <span class="ps-param">$destFileUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-string">"Destination file not found"</span>
+        <span class="ps-keyword">continue</span>
+    }
+
+    <span class="ps-keyword">if</span> (<span class="ps-param">$DryRun</span>) {
+        <span class="ps-func">Write-Host</span> <span class="ps-string">"[DRY RUN] Would delete: $sourceUrl"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Delete <span class="ps-op">-Status</span> DryRun <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-DestinationUrl</span> <span class="ps-param">$destFileUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-string">"Destination verified, planned deletion"</span>
+        <span class="ps-keyword">continue</span>
+    }
+
+    <span class="ps-keyword">try</span> {
+        <span class="ps-func">Remove-PnPFile</span> <span class="ps-op">-ServerRelativeUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-Force</span> <span class="ps-op">-Connection</span> <span class="ps-param">$SourceConn</span>
+        <span class="ps-func">Write-Host</span> <span class="ps-string">"[OK] Deleted: $sourceUrl"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Delete <span class="ps-op">-Status</span> Success <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-DestinationUrl</span> <span class="ps-param">$destFileUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-string">"Destination verified, source deleted"</span>
+    } <span class="ps-keyword">catch</span> {
+        <span class="ps-func">Write-Warning</span> <span class="ps-string">"[FAILED] $sourceUrl :: $($_.Exception.Message)"</span>
+        <span class="ps-func">Write-Log</span> <span class="ps-op">-Action</span> Delete <span class="ps-op">-Status</span> Failed <span class="ps-op">-SourceUrl</span> <span class="ps-param">$sourceUrl</span> <span class="ps-op">-DestinationUrl</span> <span class="ps-param">$destFileUrl</span> <span class="ps-op">-Modified</span> <span class="ps-param">$modified</span> <span class="ps-op">-Message</span> <span class="ps-param">$_</span>.Exception.Message
+    }
+}
+<span class="ps-func">Write-Host</span> <span class="ps-string">"Done. Log: $LogPath"</span></pre>
+          </div>
+          <div class="script-fade" id="scriptDeleteFade"></div>
+        </div>
+        <div class="expand-bar" onclick="toggleScript('scriptDeleteFull','scriptDeleteFade','deleteLabel','deleteArrow')">
+          <span id="deleteLabel">Show full script</span>
+          <span class="expand-arrow" id="deleteArrow">▼</span>
+        </div>
+      </div>
+
+    </section>
+
+<script>
+function toggleScript(fullId, fadeId, labelId, arrowId) {
+  const full  = document.getElementById(fullId);
+  const fade  = document.getElementById(fadeId);
+  const arrow = document.getElementById(arrowId);
+  const label = document.getElementById(labelId);
+  const isOpen = full.classList.contains('open');
+  full.classList.toggle('open');
+  arrow.classList.toggle('open');
+  label.textContent = isOpen ? 'Show full script' : 'Collapse';
+  if (!isOpen) fade.classList.add('hidden');
+  else fade.classList.remove('hidden');
+}
+</script>
+
+    <!-- WHAT THIS BECAME -->
+    <section class="section" style="border-bottom: none; margin-bottom: 0;">
+      <div class="eyebrow">Repeatability</div>
+      <h2>From one-off script to reusable tool</h2>
+      <p>The script worked. The project closed and the client got their archive. But it was clear this wasn't a one-off problem.</p>
+      <p>SharePoint sites grow over time, and most teams eventually need to separate active work from older content.</p>
+      <div class="callout">Without a tool, the next engineer would start from scratch. Write and test the script, adjust filters, and run the job manually again.</div>
+      <p>If the approach was solid enough to deliver the project, it made sense to package it into something reusable.</p>
+    </section>
+
+    <section class="section" style="border-bottom: none; margin-bottom: 0;">
+      <h2>Building on what worked</h2>
+      <p>The archive workflow had already been proven in production, so the next step was packaging the same logic into a reusable Windows tool.</p>
+      <p>The script and the relevant PnP.PowerShell documentation were provided to Claude as context, so it was working from patterns already validated on a live tenant.</p>
+      <p>Claude was then used to design a lightweight Windows tool that engineers could configure and run from a GUI, without needing to work directly with the PowerShell script.</p>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="card-title">Architecture prompt</div>
+        </div>
+        <div class="card-body">
+<pre>Here's a working PowerShell script that archives SharePoint folders
+using PnP.PowerShell and the Graph API. I've also attached the
+relevant PnP documentation for the cmdlets used.
+
+I want to turn this into a Windows desktop tool for internal use.
+Engineers will run it against client tenants. Authentication should
+use MSAL device code flow. No credentials should be stored.
+
+The archive process is long-running and should execute as a
+background service while streaming progress updates to the UI.
+
+Before writing any code, what architecture would you recommend
+for handling long-running migration jobs and UI progress updates?</pre>
+        </div>
+      </div>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="card-title">Configuration prompt</div>
+        </div>
+        <div class="card-body">
+<pre>The workflow works. Let's build in job configuration
+to support filters and rules so the same tool can handle
+different client scenarios.
+
+Rules the engineer should be able to set per job:
+- File type inclusion/exclusion (for example skip .tmp files)
+- Modified date filter (for example only move files not modified in 12+ months)
+- Skip folders that already exist at the destination vs overwrite
+- Operation type: copy only, or copy → verify → delete
+
+These should be configurable in the interface and saved
+as part of the job profile.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <section class="section" style="border-bottom: none; margin-bottom: 0;">
+      <div class="eyebrow">Takeaway</div>
+      <p>The problem was simple: archive old project data safely.</p>
+      <p>The solution started as a small script. With Claude, a reusable tool was designed, tested, and ready to run in about an hour.</p>
+      <p>What would normally be a small migration project is now a repeatable process that any engineer can run in minutes.</p>
+
+      <div class="screenshots-pair">
+        <div>
+          <div class="screenshot-frame">
+            <img src="screenshot-1.png" alt="MoveSP job setup — source, destination, and operation type configuration" onclick="openLightbox(this.src)" />
+          </div>
+          <div class="screenshot-caption">Job setup — source, destination &amp; operation type</div>
+        </div>
+        <div>
+          <div class="screenshot-frame">
+            <img src="screenshot-2.png" alt="MoveSP preview — file matching results before execution" onclick="openLightbox(this.src)" />
+          </div>
+          <div class="screenshot-caption">Preview — file matching before execution</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+      <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+    </div>
+
+    <script>
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+    </script>
+
+  </div>
+
+  <footer class="footer">
+    <div>MoveSP · Internal Case Study · Netsurit 2026</div>
+    <div><a href="https://tylerstewart.co.za" style="color: inherit; text-decoration: none;">tylerstewart.co.za</a></div>
+  </footer>
+
+</div>
+</body>
+</html>
