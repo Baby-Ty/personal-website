@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dreams Program — Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #D92037;
+    --primary-dim: #FFF0F2;
+    
+    --bg-page: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --bg-dark: #111111;
+    --bg-code: #1E1E1E;
+    
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --text-light: #9CA3AF;
+    --text-inverse: #FFFFFF;
+    
+    --border: #E5E7EB;
+    --border-dark: #333;
+
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    
+    --radius: 12px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-main);
+    background: var(--bg-page);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    max-width: 1120px;
+    margin: 40px auto;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    color: var(--bg-dark);
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-size: 48px; line-height: 1.1; margin-bottom: 16px; }
+  h2 { font-size: 32px; margin-bottom: 24px; margin-top: 0; }
+  h3 { font-size: 20px; margin-top: 48px; margin-bottom: 12px; }
+
+  p { margin-bottom: 24px; color: #374151; font-size: 17px; line-height: 1.75; }
+  p:last-child { margin-bottom: 0; }
+  
+  strong { font-weight: 600; color: #111; }
+  
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    background: #1E1E1E;
+    border: 1px solid #404040;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #E5E7EB;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--bg-dark);
+    color: var(--text-inverse);
+    padding: 80px 64px 72px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(200,16,46,0.15) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+  }
+
+  .cover-content { position: relative; z-index: 10; }
+
+  .cover h1 { color: white; margin-bottom: 16px; }
+  .cover h1 strong { color: white; font-weight: 700; }
+  
+  .cover-intro {
+    font-size: 20px;
+    color: #D1D5DB;
+    max-width: 600px;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 64px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 40px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: baseline;
+  }
+  
+  .stat-value span { color: var(--primary); margin-left: 2px; }
+
+  .stat-label {
+    font-size: 13px;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-meta {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #6B7280;
+  }
+
+  /* ── CONTENT BODY ── */
+  .content { padding: 0 48px 80px; }
+
+  .section {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .section:first-child { margin-top: 64px; border-top: none; padding-top: 0; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    margin-top: 40px;
+    padding-left: 24px;
+    border-left: 2px solid var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: 48px;
+  }
+  .timeline-item:last-child { margin-bottom: 0; }
+
+  .timeline-marker {
+    position: absolute;
+    left: -31px; /* -24px padding - 2px border - 5px half-dot */
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: var(--bg-card);
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+  }
+
+  .timeline-date {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .timeline-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--bg-dark);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .timeline-content {
+    font-size: 16px;
+    color: #4B5563;
+  }
+
+  /* ── STACK GRID ── */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .stack-card {
+    background: #FAFAFA;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .stack-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .stack-list {
+    list-style: none;
+  }
+  
+  .stack-list li {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--bg-dark);
+  }
+
+  /* ── COST BAR ── */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    background: var(--bg-dark);
+    color: white;
+    padding: 32px;
+    border-radius: 8px;
+    margin-top: 32px;
+  }
+
+  .cost-item small {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #6B7280;
+    margin-bottom: 8px;
+  }
+
+  .cost-item strong {
+    display: block;
+    font-size: 24px;
+    color: white;
+    margin-bottom: 4px;
+  }
+
+  .cost-item span {
+    display: block;
+    font-size: 13px;
+    color: #9CA3AF;
+  }
+
+  /* ── CODE & PROMPT CARDS (TERMINAL STYLE) ── */
+  .card-window {
+    background: #2D2D2D; /* Dark terminal border */
+    border: 1px solid #404040;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    background: #1E1E1E; /* Terminal header */
+    padding: 10px 16px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #555;
+  }
+  .dot.active { background: #D92037; }
+
+  .card-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #9CA3AF;
+  }
+
+  .card-body {
+    padding: 24px;
+    font-size: 14px;
+    background: #FFFFFF;
+    flex: 1;
+  }
+  
+  /* Make all code blocks dark by default per request */
+  .card-body.dark {
+    background: #0D0D0D; /* Deep terminal black */
+    color: #E5E7EB;
+  }
+
+  .card-note {
+    padding: 12px 24px;
+    background: #1A1A1A;
+    border-top: 1px solid #333;
+    font-size: 13px;
+    color: #D1D5DB;
+    font-family: var(--font-sans);
+    font-style: italic;
+    flex-shrink: 0;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    color: inherit;
+  }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  .grid-1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  /* ── TOGGLE BUTTON ── */
+  .btn-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-dim);
+  }
+
+  /* ── TRUNCATED TERMINAL ── */
+  .card-body.truncated {
+    max-height: 200px; /* Reduced from 380px to be more compact */
+    overflow: hidden;
+    position: relative;
+  }
+
+  .fade-overlay {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px; /* Reduced from 120px */
+    background: linear-gradient(to bottom, transparent, #0D0D0D);
+    pointer-events: none;
+  }
+
+  .card-body.truncated .fade-overlay {
+    display: block;
+  }
+
+  .terminal-footer {
+    background: #0D0D0D;
+    padding: 0 24px 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-terminal {
+    background: #1A1A1A;
+    border: 1px solid #333;
+    color: #6B7280;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .btn-terminal:hover {
+    background: #262626;
+    color: #E5E7EB;
+    border-color: #404040;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--primary-dim);
+    border-left: 4px solid var(--primary);
+    padding: 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 32px 0;
+    color: #4B5563;
+  }
+
+  /* ── SKILLS & AGENTS PREVIEW ── */
+  #hidden-skills,
+  #hidden-agents {
+    position: relative;
+    max-height: 180px; /* Partially show next row */
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  
+  #hidden-skills::after,
+  #hidden-agents::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--bg-page));
+    pointer-events: none;
+  }
+  
+  #hidden-skills.expanded,
+  #hidden-agents.expanded {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  #hidden-skills.expanded::after,
+  #hidden-agents.expanded::after {
+    display: none;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: #F9FAFB;
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .container { margin: 0; border-radius: 0; box-shadow: none; }
+    .cover { padding: 48px 24px; }
+    .content { padding: 0 24px 64px; }
+    .stats-grid, .cost-grid, .grid-2 { grid-template-columns: 1fr; }
+    .timeline { padding-left: 16px; }
+    .footer { padding: 32px 24px; flex-direction: column; gap: 16px; }
+    h1 { font-size: 36px; }
+  }
+
+  @media print {
+    .container { box-shadow: none; margin: 0; max-width: 100%; }
+    body { background: white; }
+    .cover, .cost-grid, .card-window, .card-body.dark { 
+      -webkit-print-color-adjust: exact; 
+      print-color-adjust: exact; 
+      color: black !important;
+      background: white !important;
+      border: 1px solid #ddd;
+    }
+    .card-window, .stack-card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="cover-content">
+      <div class="eyebrow" style="color:var(--primary);">Internal · Case Study</div>
+      <h1><strong>Dreamspace</strong></h1>
+      <p class="cover-intro">An internal platform for Netsurit's Dreams Program. Built with Claude Code.</p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">~350<span>h</span></div>
+          <div class="stat-label">Hours to build</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">~1500<span>h</span></div>
+          <div class="stat-label">Traditional estimate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">500<span>+</span></div>
+          <div class="stat-label">Users live</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">~$2</div>
+          <div class="stat-label">Cost / user / year</div>
+        </div>
+      </div>
+
+      <div class="cover-meta">
+        <div>Tyler Stewart · Netsurit · March 2026</div>
+        <div>293 files · 49k lines · 51 API endpoints</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- PLANNING -->
+    <section class="section">
+      <div class="eyebrow">Planning</div>
+      <h2>From brief to architecture</h2>
+      <p>Netsurit needed a simple way for employees to set goals, track progress, and stay connected with their team.</p>
+      <p>The goal was a lightweight system that could run cheaply on the existing Microsoft stack.</p>
+      <p>The sections below walk through the build and the Claude workflows used to develop it.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin: 32px 0;">
+        <div class="stack-card">
+          <div class="stack-title">Product requirements</div>
+          <ul class="stack-list" style="line-height: 2;">
+            <li>Single sign-on with Microsoft accounts</li>
+            <li>Weekly goal-setting and reflection workflow</li>
+            <li>Coach and team management</li>
+            <li>Microsoft Teams meeting integration</li>
+          </ul>
+        </div>
+        <div class="stack-card">
+          <div class="stack-title">Platform constraints</div>
+          <ul class="stack-list" style="line-height: 2;">
+            <li>Hosted entirely on Azure</li>
+            <li>Authentication through Entra ID</li>
+            <li>Microsoft Graph for calendar and identity</li>
+            <li>Cost target of ~$2 per user per year</li>
+          </ul>
+        </div>
+        <div class="stack-card" style="background: var(--primary-dim); border-color: var(--primary); border-width: 2px;">
+          <div class="stack-title" style="color: var(--primary); border-bottom-color: var(--primary);">Stack</div>
+          <ul class="stack-list" style="line-height: 2;">
+            <li>Azure Functions · Static Web Apps</li>
+            <li>Cosmos DB · Blob Storage</li>
+            <li>Entra ID · Microsoft Graph</li>
+            <li>Azure AI Foundry · Claude Code</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION -->
+    <section class="section">
+      <div class="eyebrow">Setup</div>
+      <h2>Claude project setup</h2>
+      <p>The platform was built using Claude Code, which meant most of the work happened through prompt sessions.</p>
+      <p>To avoid repeating the same context every session, a simple structure was built so each session started from the same baseline.</p>
+      <p>Three pieces ended up forming the setup:</p>
+      <ul style="margin: -8px 0 24px; padding-left: 24px; list-style: disc;">
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">CLAUDE.md</span> — project context and conventions</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">skills/</span> — reusable workflows</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">agents/</span> — specialist contexts</li>
+      </ul>
+      <div class="callout">None of this existed at the start. It evolved over time.</div>
+
+      <h3>CLAUDE.md — project context</h3>
+      <p>CLAUDE.md was kept short.</p>
+      <p>It ended up containing only the essentials:</p>
+      <ul style="margin: -8px 0 24px; padding-left: 24px; list-style: disc;">
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;">architecture overview</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;">project structure</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;">development conventions</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;">common commands</li>
+      </ul>
+      <p>Its purpose was simply to give each session enough context to stay aligned with the project.</p>
+      <p>Reusable workflows were defined as skills, while more focused tasks were handled through agents.</p>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="card-title" style="margin-left:8px">CLAUDE.md</div>
+        </div>
+        <div class="card-body dark">
+<pre>## Dreams Program
+React + Vite frontend, Azure Functions backend, Cosmos DB.
+Auth via MSAL / Entra ID. AI via Azure AI Foundry.
+
+## Architecture
+Pages → Layouts → Hooks → Services. No fetch in components.
+Files under 400 lines. Reference src/pages/dream-team/.
+
+## API
+Auth middleware on every endpoint (api/utils/authMiddleware.js).
+Verify userId ownership. Return ok() or fail() — never raw JSON.
+
+## Cosmos DB
+Always query with partition key. 10 containers:
+users, dreams, currentWeek, pastWeeks, teams, scoring,
+connects, meeting_attendance, prompts, coaching_alerts.
+
+## Common Commands
+npm run dev              # frontend localhost:5173
+cd api && func start     # backend localhost:7071
+npm test                 # run tests
+npm run docker:start     # local Cosmos emulator
+npm run setup:verify     # verify local DB setup
+
+## Data Scripts
+Any script that touches live data must have a dry-run
+mode by default. Log what would change, write nothing.
+Require --execute to perform real writes.
+Test on a single user with --test-user before bulk runs.</pre>
+        </div>
+      </div>
+
+      <h3>Skills — reusable workflows</h3>
+      <p>Skills were added as patterns repeated across sessions.</p>
+      <p>Common instructions were moved into skills instead of being written in prompts every time.</p>
+      <p style="font-family: var(--font-mono); font-size: 14px; background: #1E1E1E; border: 1px solid #404040; border-radius: 6px; padding: 10px 14px; margin: -4px 0 24px; color: #E5E7EB;">.claude/skills/</p>
+      <p>Each skill includes a short description telling Claude when to apply it.</p>
+
+      <div class="grid-2">
+        <div class="card-window">
+          <div class="card-header">
+            <div class="dot active"></div>
+            <div class="card-title" style="margin-left:8px">new-feature/SKILL.md</div>
+          </div>
+          <div id="feature-body" class="card-body dark truncated">
+            <pre>---
+name: new-feature
+description: Building a new page or feature.
+  Apply when asked to add a new section, page,
+  or user-facing capability to the app.
+---
+Create all three layers using src/pages/dream-team/
+as the reference pattern:
+
+1. Page + layout in src/pages/
+2. Hook in src/hooks/ — data and business logic
+3. Service in src/services/ — API calls only
+4. Azure Function in api/ — auth middleware,
+   userId check, ok/fail response
+
+Wire all layers together before finishing.</pre>
+            <div class="fade-overlay"></div>
+          </div>
+          <div class="terminal-footer">
+            <button class="btn-terminal" data-target="feature-body">Show full file</button>
+          </div>
+        </div>
+        <div class="card-window">
+          <div class="card-header">
+            <div class="dot active"></div>
+            <div class="card-title" style="margin-left:8px">plan/SKILL.md</div>
+          </div>
+          <div id="plan-body" class="card-body dark truncated">
+            <pre>---
+name: plan
+description: Planning a new feature or change
+  before writing code. Apply when asked to build
+  something non-trivial or when scope is unclear.
+---
+Before writing any code:
+
+1. Identify all layers affected
+   - Which pages, hooks, services change
+   - Which API endpoints are new or modified
+   - Which Cosmos containers are read or written
+2. List files that will be created or changed
+3. Identify risks
+   - Data shape changes that affect existing records
+   - Auth or permission edge cases
+   - Dependencies between the new and existing code
+4. Confirm the plan before starting
+
+Do not write code until the plan is agreed.</pre>
+            <div class="fade-overlay"></div>
+          </div>
+          <div class="terminal-footer">
+            <button class="btn-terminal" data-target="plan-body">Show full file</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="hidden-skills">
+        <div class="grid-2">
+          <div class="card-window">
+            <div class="card-header">
+              <div class="dot active"></div>
+              <div class="card-title" style="margin-left:8px">new-endpoint/SKILL.md</div>
+            </div>
+            <div id="endpoint-body" class="card-body dark truncated">
+              <pre>---
+name: new-endpoint
+description: Adding an Azure Function API endpoint.
+  Apply when asked to create, add, or build a
+  new backend endpoint or API route.
+---
+Use api/getUserData/index.js as the reference.
+
+- Import and apply authMiddleware
+- Verify req.userId matches the resource owner
+- Wrap response in ok() or fail() from
+  api/utils/responseHelpers.js
+- Register in api/host.json if needed</pre>
+              <div class="fade-overlay"></div>
+            </div>
+            <div class="terminal-footer">
+              <button class="btn-terminal" data-target="endpoint-body">Show full file</button>
+            </div>
+          </div>
+          <div class="card-window">
+            <div class="card-header">
+              <div class="dot active"></div>
+              <div class="card-title" style="margin-left:8px">onboard/SKILL.md</div>
+            </div>
+            <div id="onboard-body" class="card-body dark truncated">
+              <pre>---
+name: onboard
+description: Getting oriented in the codebase.
+  Apply at the start of a new session, when
+  context has been cleared, or when asked to
+  understand the project before making changes.
+---
+Read the following in order:
+
+1. CLAUDE.md — architecture and conventions
+2. src/pages/ — list of pages and their purpose
+3. src/hooks/ — data and state layer
+4. src/services/ — API call layer
+5. api/ — backend endpoints
+6. tailwind.config.js + src/index.css — design tokens
+
+Then summarise:
+- What the app does
+- The current state of the area being worked on
+- Any obvious issues in scope before starting
+
+Do not make changes during onboarding.</pre>
+              <div class="fade-overlay"></div>
+            </div>
+            <div class="terminal-footer">
+              <button class="btn-terminal" data-target="onboard-body">Show full file</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-window">
+            <div class="card-header">
+              <div class="dot active"></div>
+              <div class="card-title" style="margin-left:8px">review/SKILL.md</div>
+            </div>
+            <div id="review-body" class="card-body dark truncated">
+              <pre>---
+name: review
+description: Reviewing code before committing or
+  deploying. Apply when changes are ready to push,
+  before a PR, or before any production deployment.
+---
+Check the following before marking complete:
+
+- No file exceeds 400 lines — split if needed
+- Every new endpoint has authMiddleware applied
+- Every endpoint verifies userId ownership
+- All new inputs validated with Zod before use
+- Responses use ok() or fail() — no raw JSON
+- No hardcoded credentials, IDs, or env values
+- No console.log left in production paths
+- Cosmos queries include the partition key
+
+Return a list of findings or confirm it's clean.</pre>
+              <div class="fade-overlay"></div>
+            </div>
+            <div class="terminal-footer">
+              <button class="btn-terminal" data-target="review-body">Show full file</button>
+            </div>
+          </div>
+          <div class="card-window">
+            <div class="card-header">
+              <div class="dot active"></div>
+              <div class="card-title" style="margin-left:8px">debug/SKILL.md</div>
+            </div>
+            <div id="debug-body" class="card-body dark truncated">
+              <pre>---
+name: debug
+description: Diagnosing a bug or unexpected
+  behaviour. Apply when investigating any issue
+  before suggesting a fix.
+---
+Trace through all layers before proposing a fix:
+
+1. Component — what state or props trigger it
+2. Hook (src/hooks/) — how data is loaded
+3. Service (src/services/) — what the API sends
+4. Azure Function (api/) — endpoint behaviour
+5. Cosmos DB — what is actually stored
+
+Identify the exact layer, then fix it there.</pre>
+              <div class="fade-overlay"></div>
+            </div>
+            <div class="terminal-footer">
+              <button class="btn-terminal" data-target="debug-body">Show full file</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; margin-bottom: 48px;">
+        <button id="toggle-skills" class="btn-toggle">See all 6 skills</button>
+      </div>
+
+
+      <h3>Agents — task-specific contexts</h3>
+      <p>Agents came later.</p>
+      <p>Certain areas like Azure infrastructure, Microsoft Graph integrations, and security reviews kept producing answers that needed correcting. The problem wasn't capability, it was context.</p>
+      <p>Agents handle this by running those tasks in isolated contexts with their own instructions and tools.</p>
+      <p>Agents live in:</p>
+      <p style="font-family: var(--font-mono); font-size: 14px; background: #1E1E1E; border: 1px solid #404040; border-radius: 6px; padding: 10px 14px; margin: -4px 0 24px; color: #E5E7EB;">.claude/agents/</p>
+      <p>Each agent loads the context needed for that domain before the task begins.</p>
+      <p>Examples include:</p>
+      <ul style="margin: -8px 0 24px; padding-left: 24px; list-style: disc;">
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">azure-infra</span> — infrastructure and deployment changes</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">security</span> — endpoint and authentication reviews</li>
+        <li style="margin-bottom: 10px; color: #374151; font-size: 17px;"><span class="tag">graph-api</span> — Microsoft Graph integrations</li>
+      </ul>
+      <p>This keeps the main session focused while specialised tasks run with the context they need.</p>
+
+      <div class="grid-2">
+        <div class="card-window">
+          <div class="card-header">
+            <div class="dot active"></div>
+            <div class="card-title" style="margin-left:8px">azure-infra/AGENT.md</div>
+          </div>
+          <div id="azure-body" class="card-body dark truncated"><pre>---
+name: azure-infra
+description: Azure infrastructure expert. Use
+  proactively when reviewing or changing Azure
+  Functions, Cosmos DB, Blob Storage, Static Web
+  Apps config, or CI/CD pipelines.
+tools: Read, Glob, Grep, Bash
+model: sonnet
+---
+You are a senior Azure architect. This project runs
+on Azure Static Web Apps, Azure Functions (Node.js),
+Cosmos DB with 10 containers, and Azure Blob Storage.
+Auth is via Entra ID / MSAL.
+
+When reviewing infrastructure changes:
+- Flag any Cosmos DB queries missing a partition key
+- Check Function bindings and host.json config
+- Verify environment variables are in Azure Portal,
+  not hardcoded or in committed config files
+- Review autoscale settings and RU/s implications
+- Check CORS, auth config, and Static Web App routes
+- Flag anything that would increase monthly cost
+  beyond the ~$995/year baseline
+
+Reference: README.md for the full architecture overview.</pre>
+            <div class="fade-overlay"></div>
+          </div>
+          <div class="terminal-footer">
+            <button class="btn-terminal" data-target="azure-body">Show full file</button>
+          </div>
+        </div>
+        <div class="card-window">
+          <div class="card-header">
+            <div class="dot active"></div>
+            <div class="card-title" style="margin-left:8px">security/AGENT.md</div>
+          </div>
+          <div id="security-body" class="card-body dark truncated"><pre>---
+name: security
+description: Web app security expert. Use
+  proactively after adding endpoints, changing
+  auth logic, or before any production deployment.
+tools: Read, Glob, Grep
+model: sonnet
+---
+You are a senior web application security engineer.
+This app uses MSAL / Entra ID for auth, Azure
+Functions for the backend, and Cosmos DB partitioned
+by userId.
+
+Review for:
+- Endpoints missing authMiddleware from
+  api/utils/authMiddleware.js
+- Missing userId ownership checks — authenticated
+  user must match the resource being accessed
+- Hardcoded credentials, API keys, or secrets
+  in any committed file
+- CORS misconfiguration in staticwebapp.config.json
+- Input validation gaps — all user input must pass
+  through Zod schemas before reaching the database
+- Any operation that could allow cross-user data
+  access by manipulating request parameters
+
+Return a risk-ranked list of findings with
+the exact file and line for each.</pre>
+            <div class="fade-overlay"></div>
+          </div>
+          <div class="terminal-footer">
+            <button class="btn-terminal" data-target="security-body">Show full file</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="hidden-agents">
+        <div class="grid-2">
+          <div class="card-window">
+            <div class="card-header">
+              <div class="dot active"></div>
+              <div class="card-title" style="margin-left:8px">graph-api/AGENT.md</div>
+            </div>
+            <div id="graph-body" class="card-body dark truncated"><pre>---
+name: graph-api
+description: Microsoft Graph API specialist.
+  Use when integrating calendar, mailbox settings,
+  user profile, or any Graph endpoint. Invoke before
+  writing new Graph calls or debugging auth failures.
+tools: Read, Glob, Grep, WebFetch
+model: sonnet
+---
+You are a Microsoft Graph API integration specialist.
+
+This app authenticates via MSAL with Entra ID.
+Tokens are acquired on the frontend and forwarded
+to Azure Functions which call Graph on behalf of
+the user (on-behalf-of flow).
+
+Current integrations:
+- Calendar events (read/write) via /me/events
+- Mailbox settings for timezone detection
+- User profile data for display and identity
+
+When writing new Graph calls:
+- Confirm the correct permission scope is declared
+  in the Entra app registration (delegated vs app)
+- Use the correct base URL (graph.microsoft.com/v1.0)
+- Verify the OData query parameters for the endpoint
+- Check token forwarding in api/utils/authMiddleware.js
+- Never hardcode Graph tokens or user IDs
+
+When debugging:
+- Check the token has the required scope
+- Confirm the Entra app has admin consent for the scope
+- Test with Graph Explorer before assuming code error
+
+Return the exact Graph endpoint, required permissions,
+and a working code example using this project's
+existing auth pattern.</pre>
+              <div class="fade-overlay"></div>
+            </div>
+            <div class="terminal-footer">
+              <button class="btn-terminal" data-target="graph-body">Show full file</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; margin-bottom: 48px;">
+        <button id="toggle-agents" class="btn-toggle">See all 3 agents</button>
+      </div>
+
+      <div class="callout">
+        None of this was set up on day one. CLAUDE.md started as a few lines and grew when sessions drifted. Skills appeared when the same instructions kept getting typed. Agents arrived when specialist questions kept needing correction. The configuration layer is what the project accumulated — and once it was committed, every session after that started from the same place.
+      </div>
+    </section>
+
+    <!-- PROMPTS -->
+    <section class="section">
+      <div class="eyebrow">Workflow</div>
+      <h2>How the prompts worked</h2>
+      <p>The sessions that produced the best results followed a simple structure: <strong>context</strong> → <strong>tasks</strong> → <strong>constraints</strong>.</p>
+      <p>Clear context and specific instructions reduced the amount of rework needed later.</p>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="card-title" style="margin-left:8px">Full-stack feature from a single session</div>
+        </div>
+        <div class="card-body dark"><pre>The Dream Team page needs meeting attendance tracking.
+
+- Cosmos schema for meeting_attendance, partitioned by teamId
+- Azure Functions: getMeetingAttendance, saveMeetingAttendance
+- Schedule team meetings using the Graph Calendar API
+- Attendance checklist card — present/absent toggles
+- Attendance rate as a metric in the Report Builder
+
+Coaches schedule and update meetings. Team members can view meetings and attendance.</pre></div>
+        <div class="card-note">Schema, backend, Graph API integration, and UI — all connected in one session.</div>
+      </div>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="card-title" style="margin-left:8px">Production incident — 35 users on the wrong week</div>
+        </div>
+        <div class="card-body dark"><pre>35 users were rolled over to the next week twice.
+A local development instance ran the rollover at the same time as the Azure timer.
+Affected users are on W08, but should be W07.
+
+Backups are in backups/.
+
+- Restore currentWeek and pastWeeks from backups for all users
+- Fix the timer so local development cannot trigger production jobs
+- Add a safeguard so the rollover can only run once per week</pre></div>
+        <div class="card-note">Rollback script written, tested in dry-run, executed, and the root cause fixed in the same session.</div>
+      </div>
+
+<div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="card-title" style="margin-left:8px">Cross-system integration — Graph API</div>
+        </div>
+        <div class="card-body dark"><pre>Two things to fix with meeting scheduling:
+
+Meetings are created in the wrong timezone — the coach's timezone isn't being read from Graph.
+Meetings aren't Teams-enabled, so no join link is generated.
+
+Fetch the coach's timezone from mailboxSettings when the scheduling form loads.
+Add a timezone dropdown that defaults to the coach's timezone.
+Set isOnlineMeeting: true in the Graph event.</pre></div>
+        <div class="card-note">Touching the Graph API, Cosmos, and the React form simultaneously. Claude looked up the correct Graph payload fields mid-session.</div>
+      </div>
+
+    </section>
+
+    <!-- WHAT DIDNT WORK -->
+    <section class="section">
+      <div class="eyebrow">Honest Assessment</div>
+      <h2>Where it struggled</h2>
+      <p>Not everything worked the first time, but most issues came down to context, not capability.</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-marker"></div>
+          <span class="timeline-title">Infrastructure context</span>
+          <div class="timeline-content">Early Azure infrastructure questions produced sensible answers, but not answers specific to this architecture. Once the <span class="tag">azure-infra</span> agent loaded the project context, infrastructure sessions became far more reliable.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-marker"></div>
+          <span class="timeline-title">Less familiar APIs</span>
+          <div class="timeline-content">For common stacks like React, Azure Functions, and Cosmos DB the first pass was usually correct. Less common integrations like Graph mailbox settings or Entra token flows sometimes needed verification or small tweaks.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW TO START -->
+    <section class="section">
+      <div class="eyebrow">Replication</div>
+      <h2>Starting a new project</h2>
+      <p>How I'd start from scratch.</p>
+
+      <div class="card-window">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <div class="card-title" style="margin-left:8px">Quick Start</div>
+        </div>
+        <div class="card-body dark">
+<pre>1.  Install Claude Code
+    npm install -g @anthropic-ai/claude-code
+
+2.  Initialise the project
+    cd your-project && claude
+    /init  →  review and trim the generated CLAUDE.md
+
+3.  Add what /init misses to CLAUDE.md
+    - Architecture pattern (your layer structure)
+    - Key file references (the canonical example for each layer)
+    - API conventions (auth pattern, error pattern)
+    - Data constraints (partition keys, schema rules)
+    - Common commands (dev, test, build, deploy)
+
+4.  Create your skills in .claude/skills/
+    - plan/SKILL.md          (think before you code)
+    - onboard/SKILL.md       (orient in the codebase)
+    - new-feature/SKILL.md   (scaffolds all layers)
+    - new-endpoint/SKILL.md  (API boilerplate)
+    - review/SKILL.md        (pre-push pattern check)
+    - debug/SKILL.md         (full-stack trace before fix)
+
+5.  Create specialist agents in .claude/agents/
+    - One per external system (Azure, Graph API, etc.)
+    - One security agent for pre-deployment review
+    Include real architecture details in each agent's context
+
+6.  Configure .claude/settings.json
+    - Set ask for git push
+    - Deny .env and secrets files
+
+7.  Set up local dev environment
+    - Docker + database emulator for safe local dev
+    - Separate local config that never touches production
+
+8.  Session discipline from day one
+    - One context window per active workstream
+    - /clear or new session after heavy iteration
+    - Don't wait for the 200k token limit — move earlier
+
+9.  Commit the .claude/ folder
+    The whole team gets the same setup.
+    Standards don't drift between sessions.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <section class="section" style="border-bottom:none; margin-bottom: 0;">
+      <div class="eyebrow">Takeaway</div>
+      <h2>What actually mattered</h2>
+      <p><strong>Context, not prompting.</strong> The sessions that worked best weren't about clever prompts. They worked because Claude had the right project context. CLAUDE.md, skills, and agents are how you give it that context.</p>
+      <p><strong>Structure compounds.</strong> Every skill added meant the same instructions never needed typing again. Every agent meant fewer wrong answers in that domain. The setup investment pays back across every session after.</p>
+      <p><strong>Scope sessions like tasks.</strong> The clearer the context, the tasks, and the constraints — the more reliable the output. One workstream per session. Fresh context over long degraded ones.</p>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+    <div>Dreams Program · Internal Case Study</div>
+    <div>Tyler Stewart · March 2026</div>
+  </footer>
+
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggle-skills');
+    const hiddenSkills = document.getElementById('hidden-skills');
+    
+    if (toggleBtn && hiddenSkills) {
+      toggleBtn.addEventListener('click', () => {
+        hiddenSkills.classList.toggle('expanded');
+        
+        if (hiddenSkills.classList.contains('expanded')) {
+          toggleBtn.textContent = 'Show less';
+        } else {
+          toggleBtn.textContent = 'See all 6 skills';
+        }
+      });
+    }
+
+    const toggleAgentsBtn = document.getElementById('toggle-agents');
+    const hiddenAgents = document.getElementById('hidden-agents');
+    
+    if (toggleAgentsBtn && hiddenAgents) {
+      toggleAgentsBtn.addEventListener('click', () => {
+        hiddenAgents.classList.toggle('expanded');
+        
+        if (hiddenAgents.classList.contains('expanded')) {
+          toggleAgentsBtn.textContent = 'Show less';
+        } else {
+          toggleAgentsBtn.textContent = 'See all 3 agents';
+        }
+      });
+    }
+
+    // Generic handler for all terminal toggles - synchronizes expansion per row
+    document.querySelectorAll('.btn-terminal').forEach(button => {
+      button.addEventListener('click', function() {
+        // Find the container row (grid-2 or grid-1)
+        const row = this.closest('.grid-2, .grid-1');
+        
+        // Determine desired state based on the clicked button
+        // If currently showing "Show full file", we want to expand (remove truncated)
+        const isExpanding = this.textContent.includes('Show full');
+        
+        // Find all toggle buttons in this row to sync them
+        const buttons = row.querySelectorAll('.btn-terminal');
+        
+        buttons.forEach(btn => {
+          const targetId = btn.getAttribute('data-target');
+          const targetBody = document.getElementById(targetId);
+          
+          if (targetBody) {
+            if (isExpanding) {
+              targetBody.classList.remove('truncated');
+              btn.textContent = 'Show less';
+            } else {
+              targetBody.classList.add('truncated');
+              btn.textContent = 'Show full file';
+            }
+          }
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>
