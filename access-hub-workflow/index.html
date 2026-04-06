@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Access Hub — How It Works</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:          #0f1117;
+    --ink2:         #374151;
+    --muted:        #6b7280;
+    --light:        #9ca3af;
+    --dim:          #d1d5db;
+    --border:       #e5e7eb;
+    --surface:      #f9fafb;
+    --white:        #ffffff;
+    --accent:       #c0392b;
+    --accent-mid:   #e74c3c;
+    --accent-dim:   #fef2f2;
+    --accent-border:#fecaca;
+    --green:        #059669;
+    --green-dim:    #ecfdf5;
+    --green-border: #a7f3d0;
+    --blue:         #1d5bbf;
+    --blue-dim:     #eff6ff;
+    --blue-border:  #bfdbfe;
+    --amber:        #d97706;
+    --amber-dim:    #fffbeb;
+    --amber-border: #fde68a;
+    --purple:       #7c3aed;
+    --purple-dim:   #f5f3ff;
+    --purple-border:#ddd6fe;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── Cover ── */
+  .cover {
+    padding: 72px 0 56px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -32px; right: -32px; height: 4px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-mid) 100%);
+  }
+  .cover-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 99px;
+    margin-bottom: 28px;
+  }
+  .cover h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    color: var(--ink);
+    max-width: 640px;
+    margin-bottom: 20px;
+  }
+  .cover h1 em { font-style: normal; color: var(--accent); }
+  .cover-sub {
+    font-size: 1.125rem;
+    color: var(--ink2);
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 40px;
+  }
+
+  /* ── Quick summary bar ── */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .summary-item {
+    padding: 20px 18px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .summary-item:last-child { border-right: none; }
+  .summary-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .summary-item h4 { font-size: .875rem; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .summary-item p  { font-size: .8125rem; color: var(--muted); line-height: 1.45; }
+
+  /* ── Sections ── */
+  section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -.025em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .section-intro {
+    font-size: 1rem;
+    color: var(--ink2);
+    max-width: 620px;
+    line-height: 1.75;
+    margin-bottom: 40px;
+  }
+
+  /* ── Main flow ── */
+  .flow { display: flex; flex-direction: column; gap: 2px; }
+
+  .flow-step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 0;
+  }
+
+  /* connector column */
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+  }
+  .flow-line {
+    width: 2px;
+    flex: 1;
+    background: var(--border);
+    margin: 4px 0;
+    min-height: 24px;
+  }
+  .flow-step:last-child .flow-line { display: none; }
+
+  /* content column */
+  .flow-content {
+    padding: 4px 0 32px 20px;
+  }
+  .flow-content h3 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .flow-content p {
+    font-size: .9375rem;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 580px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Email mock ── */
+  .email-mock {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 12px 0;
+    font-size: .875rem;
+  }
+  .email-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .email-header .row { display: flex; gap: 8px; }
+  .email-header .row .lbl { color: var(--light); width: 52px; flex-shrink: 0; }
+  .email-header .row .val { color: var(--ink2); }
+  .email-body {
+    padding: 14px 16px;
+    color: var(--ink2);
+    line-height: 1.65;
+    background: var(--white);
+  }
+
+  /* ── Extraction mock ── */
+  .extract-mock {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 12px 0;
+    font-size: .875rem;
+  }
+  .extract-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .extract-header .title { font-size: .8125rem; font-weight: 600; color: var(--muted); }
+  .extract-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .extract-row:last-child { border-bottom: none; }
+  .extract-key {
+    width: 140px;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    color: var(--light);
+    font-size: .8125rem;
+  }
+  .extract-val {
+    padding: 10px 16px;
+    color: var(--ink);
+    font-weight: 500;
+    font-size: .875rem;
+  }
+  .extract-val.missing {
+    color: var(--accent);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* ── Form mock ── */
+  .form-mock {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 12px 0;
+  }
+  .form-mock-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .form-mock-header .title { font-size: .875rem; font-weight: 700; color: var(--ink); }
+  .form-mock-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .form-field { display: flex; flex-direction: column; gap: 4px; }
+  .form-field label { font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .form-input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: .875rem;
+    color: var(--ink);
+    background: var(--white);
+    font-family: inherit;
+  }
+  .form-input.empty {
+    border-color: var(--accent-border);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .form-input.prefilled { background: var(--green-dim); border-color: var(--green-border); color: var(--ink); }
+  .form-submit {
+    margin-top: 4px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    font-size: .875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: default;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── Ticket mock ── */
+  .ticket-mock {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 12px 0;
+    font-size: .875rem;
+  }
+  .ticket-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .ticket-header .title { font-size: .875rem; font-weight: 700; color: var(--ink); }
+  .ticket-body { padding: 14px 16px; }
+  .ticket-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ticket-field .lbl { font-size: .75rem; color: var(--light); margin-bottom: 1px; }
+  .ticket-field .val { font-size: .875rem; font-weight: 600; color: var(--ink); }
+
+  /* ── Type cards ── */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .type-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    background: var(--white);
+  }
+  .type-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .type-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .type-card h4 { font-size: .9375rem; font-weight: 700; color: var(--ink); }
+  .type-card .fields {
+    font-size: .8125rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .type-card .auto-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+
+  /* ── Who sees what ── */
+  .actor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .actor-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .actor-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .actor-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .actor-header h4 { font-size: .9375rem; font-weight: 700; color: var(--ink); }
+  .actor-header p  { font-size: .8125rem; color: var(--muted); }
+  .actor-body { padding: 14px 18px; }
+  .actor-item {
+    display: flex;
+    gap: 8px;
+    font-size: .875rem;
+    color: var(--ink2);
+    padding: 4px 0;
+    align-items: flex-start;
+  }
+  .actor-item::before { content: '·'; color: var(--dim); flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Audit table ── */
+  .audit-mock {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: .875rem;
+  }
+  .audit-mock-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .audit-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .audit-row:last-child { border-bottom: none; }
+  .audit-time { color: var(--light); font-size: .8125rem; width: 70px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .audit-event { color: var(--ink2); flex: 1; }
+  .audit-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    margin: 20px 0 0;
+  }
+  .callout p { font-size: .9375rem; color: var(--ink2); line-height: 1.7; }
+  .callout strong { color: var(--ink); }
+
+  /* pill utility */
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 99px;
+  }
+  .pill-green  { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green-border); }
+  .pill-blue   { background: var(--blue-dim);    color: var(--blue);   border: 1px solid var(--blue-border); }
+  .pill-amber  { background: var(--amber-dim);   color: var(--amber);  border: 1px solid var(--amber-border); }
+  .pill-red    { background: var(--accent-dim);  color: var(--accent); border: 1px solid var(--accent-border); }
+  .pill-purple { background: var(--purple-dim);  color: var(--purple); border: 1px solid var(--purple-border); }
+  .pill-grey   { background: var(--surface);     color: var(--muted);  border: 1px solid var(--border); }
+
+  /* ── Footer ── */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer p { font-size: .8125rem; color: var(--light); }
+
+  @media print {
+    .cover { page-break-after: always; }
+    section { padding: 40px 0; }
+    a { text-decoration: none; color: inherit; }
+    .no-print { display: none; }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 0 20px; }
+    .summary-bar { grid-template-columns: 1fr 1fr; }
+    .summary-item:nth-child(2) { border-right: none; }
+    .ticket-fields { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Cover ── -->
+  <div class="cover">
+    <div class="cover-label">Workflow overview</div>
+    <h1>How Access Hub works —<br/><em>start to finish.</em></h1>
+    <p class="cover-sub">
+      A client sends an email. By the time a technician sees it, the request is already
+      parsed, structured, and sitting in ConnectWise — ready to approve.
+      This document explains every step in between.
+    </p>
+
+    <div class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-icon">📧</div>
+        <div>
+          <h4>Email in</h4>
+          <p>Client sends a request in plain English — no portals, no training</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">🤖</div>
+        <div>
+          <h4>Claude reads it</h4>
+          <p>Classifies the request and extracts every relevant field</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">📋</div>
+        <div>
+          <h4>Form sent back</h4>
+          <p>Requester gets a secure pre-filled link to confirm or complete</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">✅</div>
+        <div>
+          <h4>Done</h4>
+          <p>ConnectWise ticket with a single one-click provision approval link</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── The full flow ── -->
+  <section>
+    <div class="section-label">Step by step</div>
+    <h2>The full request lifecycle.</h2>
+    <p class="section-intro">
+      Every IT request follows the same path — from the moment a client hits send,
+      to the moment the team has everything they need.
+    </p>
+
+    <div class="flow">
+
+      <!-- Step 1 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--ink);color:white">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>Client sends an email</h3>
+          <p>
+            The client emails our service desk mailbox — exactly as they normally would.
+            No portal, no ticket system, no changes to how they work.
+          </p>
+          <div class="email-mock">
+            <div class="email-header">
+              <div class="row"><span class="lbl">From</span><span class="val">sarah.johnson@acmecorp.co.za</span></div>
+              <div class="row"><span class="lbl">To</span><span class="val">support@netsurit.com</span></div>
+              <div class="row"><span class="lbl">Subject</span><span class="val">New starter — Emma Clarke</span></div>
+            </div>
+            <div class="email-body">
+              Hi, we have a new starter joining soon — Emma Clarke in Finance. Can you get her set up please? Thanks, Sarah.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--blue);color:white">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>Received and matched to a client</h3>
+          <p>
+            The email arrives via our service desk mailbox. The sender's domain is matched against
+            our client list and the request is automatically attributed to the right organisation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--purple);color:white">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>Reads the email and extracts the data</h3>
+          <p>
+            The email body is sent to Claude, which reads the message, identifies the type
+            of request, and pulls out every relevant field it can find. It also flags
+            anything that's missing or ambiguous.
+          </p>
+          <div class="extract-mock">
+            <div class="extract-header">
+              <span class="title">Extracted data</span>
+            </div>
+            <div class="extract-row"><span class="extract-key">Full name</span><span class="extract-val">Emma Clarke</span></div>
+            <div class="extract-row"><span class="extract-key">Department</span><span class="extract-val">Finance</span></div>
+            <div class="extract-row"><span class="extract-key">Start date</span><span class="extract-val missing">Not found — will ask requester</span></div>
+            <div class="extract-row"><span class="extract-key">Job title</span><span class="extract-val missing">Not found — will ask requester</span></div>
+            <div class="extract-row"><span class="extract-key">Manager</span><span class="extract-val missing">Not found — will ask requester</span></div>
+            <div class="extract-row"><span class="extract-key">License</span><span class="extract-val missing">Not found — will ask requester</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--amber);color:white">4</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>Pre-filled form link sent back to the client</h3>
+          <p>
+            The client gets an automated reply with a link to a pre-filled form. It's unique
+            to their request and expires in 72 hours.
+          </p>
+
+          <!-- Real email render -->
+          <div style="max-width:540px;margin:12px 0;background:#f0f0f0;border-radius:10px;padding:20px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <!-- Header -->
+              <tr>
+                <td style="background:#fff;border-radius:10px 10px 0 0;border:1px solid #e5e5e5;border-bottom:none;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0"><tr>
+                    <td style="padding-right:8px;vertical-align:middle;">
+                      <div style="width:26px;height:26px;background:#C8101F;border-radius:4px;text-align:center;line-height:26px;">
+                        <span style="color:#fff;font-weight:900;font-size:14px;">N</span>
+                      </div>
+                    </td>
+                    <td style="vertical-align:middle;font-size:13px;font-weight:600;color:#111;">Access Hub</td>
+                  </tr></table>
+                </td>
+              </tr>
+              <!-- Body -->
+              <tr>
+                <td style="background:#fff;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;padding:16px 20px 12px;">
+                  <p style="margin:0;font-size:13px;color:#444;line-height:1.6;">Thanks — we've picked up your request. Please use the secure link below to review the pre-filled form, complete any missing details, and submit.</p>
+                </td>
+              </tr>
+              <!-- Extracted fields -->
+              <tr>
+                <td style="background:#fff;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;padding:0 0 4px;">
+                  <table style="border-collapse:collapse;width:100%;">
+                    <thead><tr><td colspan="2" style="padding:7px 20px;background:#f7f7f7;font-size:10px;font-weight:700;letter-spacing:0.08em;color:#999;text-transform:uppercase;border-bottom:1px solid #eee;border-top:1px solid #eee;">Extracted</td></tr></thead>
+                    <tbody>
+                      <tr><td style="padding:8px 20px;border-bottom:1px solid #f0f0f0;color:#888;font-size:12px;width:40%;">Full Name</td><td style="padding:8px 20px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#111;font-weight:500;">Emma Clarke</td></tr>
+                      <tr><td style="padding:8px 20px;color:#888;font-size:12px;">Department</td><td style="padding:8px 20px;font-size:12px;color:#111;font-weight:500;">Finance</td></tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <!-- Link footer -->
+              <tr>
+                <td style="background:#f7f7f7;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 10px 10px;padding:16px 20px;">
+                  <p style="margin:0 0 3px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#999;">Secure form link</p>
+                  <p style="margin:0 0 10px;font-size:11px;color:#888;font-family:monospace;">https://intake.yourmsp.co.za/request/a7x2k9f1...</p>
+                  <table cellpadding="0" cellspacing="0" width="100%"><tr>
+                    <td><a href="#" style="display:inline-block;background:#C8101F;color:#fff;padding:9px 18px;border-radius:7px;text-decoration:none;font-weight:600;font-size:13px;">Open form &rarr;</a></td>
+                    <td align="right" style="font-size:11px;color:#aaa;vertical-align:middle;">Expires in 72 hours</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--amber);color:white">5</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>Requester reviews and completes the form</h3>
+          <p>
+            The client opens the link, authenticates, and sees the form. Every field Claude
+            extracted is pre-filled. The missing fields are empty and marked required.
+            They fill them in and hit submit.
+          </p>
+
+          <!-- Real form render -->
+          <div style="max-width:540px;margin:12px 0;background:#e8e8e5;border-radius:12px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            <!-- App header -->
+            <div style="background:#f2f2ef;border-bottom:1px solid #d2d2ce;padding:0 16px;height:48px;display:flex;align-items:center;gap:10px;">
+              <div style="width:22px;height:22px;background:#C8101F;border-radius:3px;text-align:center;line-height:22px;flex-shrink:0;">
+                <span style="color:#fff;font-weight:900;font-size:12px;">N</span>
+              </div>
+              <span style="font-size:13px;font-weight:600;color:#1a1a1a;">Access Hub</span>
+            </div>
+            <!-- Page content -->
+            <div style="padding:20px 16px;display:flex;flex-direction:column;gap:12px;">
+              <!-- Summary card -->
+              <div style="background:#f2f2ef;border:1px solid #d2d2ce;border-radius:10px;overflow:hidden;">
+                <div style="background:#e2e2df;border-bottom:1px solid #d2d2ce;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-size:14px;font-weight:600;color:#1a1a1a;">New Starter</span>
+                  <span style="font-size:11px;color:#9a9a97;">Show original ▼</span>
+                </div>
+                <div style="padding:8px 16px 10px;display:flex;gap:20px;">
+                  <span style="font-size:11px;color:#9a9a97;">ID: <span style="font-family:monospace;color:#5a5a58;">cm9x7k2a</span></span>
+                  <span style="font-size:11px;color:#9a9a97;">Expires: 08/05/2026 09:14</span>
+                </div>
+              </div>
+              <!-- Form card -->
+              <div style="background:#f2f2ef;border:1px solid #d2d2ce;border-radius:10px;padding:16px;">
+                <p style="font-size:12px;color:#5a5a58;margin:0 0 14px;">Please review the details below, complete any missing fields, and submit.</p>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">Full Name <span style="color:#C8101F;">*</span></label>
+                    <div style="background:#e2e2df;border:1px solid #bfbfbb;border-radius:7px;padding:7px 10px;font-size:13px;color:#1a1a1a;">Emma Clarke</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">Department</label>
+                    <div style="background:#e2e2df;border:1px solid #bfbfbb;border-radius:7px;padding:7px 10px;font-size:13px;color:#1a1a1a;">Finance</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">Start Date <span style="color:#C8101F;">*</span></label>
+                    <div style="background:#e2e2df;border:1px solid #C8101F;border-radius:7px;padding:7px 10px;font-size:13px;color:#9a9a97;">e.g. 15 May 2026</div>
+                    <p style="font-size:11px;color:#C8101F;margin:4px 0 0;">Start Date is required</p>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">Job Title</label>
+                    <div style="background:#e2e2df;border:1px solid #bfbfbb;border-radius:7px;padding:7px 10px;font-size:13px;color:#9a9a97;">e.g. Finance Analyst</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">Manager</label>
+                    <div style="background:#e2e2df;border:1px solid #bfbfbb;border-radius:7px;padding:7px 10px;font-size:13px;color:#9a9a97;">e.g. Tom Richards</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;">License <span style="color:#C8101F;">*</span></label>
+                    <div style="background:#e2e2df;border:1px solid #C8101F;border-radius:7px;padding:7px 10px;font-size:13px;color:#9a9a97;">— Select —</div>
+                    <p style="font-size:11px;color:#C8101F;margin:4px 0 0;">License is required</p>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:4px;">
+                    <button style="flex:1;background:#C8101F;color:#fff;border:none;border-radius:7px;padding:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:default;">Submit Request</button>
+                    <button style="background:transparent;color:#5a5a58;border:1px solid #d2d2ce;border-radius:7px;padding:10px 16px;font-size:13px;font-family:inherit;cursor:default;">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--green);color:white">6</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>ConnectWise ticket updated with an internal note</h3>
+          <p>
+            Once submitted, the ConnectWise ticket is updated with an internal note containing
+            all the structured data. The assigned technician is notified and sees a one-click
+            approval link directly in the ticket.
+          </p>
+
+          <!-- ConnectWise ticket mock -->
+          <div style="max-width:540px;margin:12px 0;border-radius:10px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;border:1px solid #d0d5dd;">
+            <!-- CW header bar -->
+            <div style="background:#1b2a4a;padding:0 16px;height:44px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em;">ConnectWise</span>
+                <span style="color:#6b8ab8;font-size:12px;">/ Service Desk / Tickets</span>
+              </div>
+            </div>
+            <!-- Ticket title bar -->
+            <div style="background:#f8f9fb;border-bottom:1px solid #e3e8ef;padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:11px;color:#8a96a8;margin-bottom:3px;">TKT-20481 &middot; Acme Corp &middot; Assigned to <strong style="color:#374151;">James van der Merwe</strong></div>
+                <div style="font-size:14px;font-weight:700;color:#111;">New starter — Emma Clarke</div>
+              </div>
+              <span style="display:inline-block;background:#fff8e1;border:1px solid #ffe082;color:#b45309;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;">Awaiting Approval</span>
+            </div>
+            <!-- Internal note -->
+            <div style="background:#fff;padding:14px 16px;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                <span style="display:inline-block;background:#fff3cd;border:1px solid #ffc107;color:#856404;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;">Internal Note</span>
+                <span style="font-size:11px;color:#8a96a8;">Access Hub &middot; today at 09:14</span>
+              </div>
+              <p style="font-size:12px;color:#374151;margin:0 0 12px;line-height:1.6;">
+                The client has completed the intake form. All required fields confirmed. Ready to action.
+              </p>
+              <!-- Structured data in note -->
+              <table style="border-collapse:collapse;width:100%;margin-bottom:14px;border:1px solid #e3e8ef;border-radius:6px;overflow:hidden;">
+                <thead><tr><td colspan="2" style="padding:6px 12px;background:#f3f4f6;font-size:10px;font-weight:700;letter-spacing:.08em;color:#8a96a8;text-transform:uppercase;border-bottom:1px solid #e3e8ef;">Request details</td></tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;width:38%;">Full name</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">Emma Clarke</td></tr>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">Start date</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">15 May 2026</td></tr>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">Job title</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">Finance Analyst</td></tr>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">Department</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">Finance</td></tr>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">Manager</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">Tom Richards</td></tr>
+                  <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">License</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">M365 Business Premium</td></tr>
+                  <tr><td style="padding:7px 12px;font-size:12px;color:#8a96a8;">Requested by</td><td style="padding:7px 12px;font-size:12px;font-weight:600;color:#111;">sarah.johnson@acmecorp.co.za</td></tr>
+                </tbody>
+              </table>
+              <!-- One-click approve -->
+              <div style="background:#f8f9fb;border:1px solid #e3e8ef;border-radius:7px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <span style="font-size:12px;color:#5a6472;">James, everything is confirmed. One click to provision.</span>
+                <button style="background:#1b6f3f;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;font-family:inherit;cursor:default;">✓ Approve &amp; provision</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--accent);color:white">7</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <h3>One click — account actioned, credentials sent</h3>
+          <p>
+            The technician clicks <strong>Approve &amp; action</strong>. The system creates the Microsoft 365
+            account in Entra, assigns the license, grants shared mailbox access, generates a
+            temporary password, and emails the credentials to the requester — all in one step.
+          </p>
+
+          <!-- Real credentials email render -->
+          <div style="max-width:540px;margin:12px 0;background:#f0f0f0;border-radius:10px;padding:20px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <!-- Header -->
+              <tr>
+                <td style="background:#fff;border-radius:10px 10px 0 0;border:1px solid #e5e5e5;border-bottom:none;padding:14px 20px;">
+                  <table cellpadding="0" cellspacing="0"><tr>
+                    <td style="padding-right:8px;vertical-align:middle;">
+                      <div style="width:26px;height:26px;background:#C8101F;border-radius:4px;text-align:center;line-height:26px;">
+                        <span style="color:#fff;font-weight:900;font-size:14px;">N</span>
+                      </div>
+                    </td>
+                    <td style="vertical-align:middle;font-size:13px;font-weight:600;color:#111;">Access Hub</td>
+                  </tr></table>
+                </td>
+              </tr>
+              <!-- Body -->
+              <tr>
+                <td style="background:#fff;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;padding:16px 20px;">
+                  <p style="margin:0 0 12px;font-size:13px;color:#444;">Hi Sarah,</p>
+                  <p style="margin:0 0 16px;font-size:13px;color:#444;line-height:1.6;">The Microsoft 365 account for <strong>Emma Clarke</strong> has been provisioned and is ready to use.</p>
+                  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
+                    <tr>
+                      <td style="padding:9px 12px;border:1px solid #eee;color:#888;font-size:12px;width:40%;">Username (UPN)</td>
+                      <td style="padding:9px 12px;border:1px solid #eee;font-size:12px;font-family:monospace;color:#111;">emma.clarke@acmecorp.co.za</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:9px 12px;border:1px solid #eee;color:#888;font-size:12px;">Temporary password</td>
+                      <td style="padding:9px 12px;border:1px solid #eee;font-size:12px;font-family:monospace;color:#111;">Kx7#mRqP24!</td>
+                    </tr>
+                  </table>
+                  <p style="margin:0;font-size:12px;color:#888;line-height:1.6;">Emma will be prompted to change her password on first sign-in. Shared mailbox access to <span style="font-family:monospace;">accounts@acmecorp.co.za</span> has been granted.</p>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="background:#f7f7f7;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 10px 10px;padding:12px 20px;text-align:center;">
+                  <span style="font-size:11px;color:#bbb;">Access Hub &middot; Automated message — do not reply</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="callout" style="margin-top:16px">
+            <p>
+              <strong>For leavers:</strong> the same one-click approval disables the account in Entra,
+              blocks sign-in, revokes active sessions, and applies any mailbox forwarding or
+              delegation rules specified in the request. No steps to remember, no end-of-day rush.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot" style="background:var(--ink2);color:white">8</div>
+        </div>
+        <div class="flow-content">
+          <h3>Every action is logged to the audit trail</h3>
+          <p>
+            Every request is logged end to end — who sent it, what was extracted,
+            when the form was viewed and submitted, and what actions were taken.
+          </p>
+          <div class="audit-mock">
+            <div class="audit-mock-header">Audit trail — Emma Clarke / New starter</div>
+            <div class="audit-row">
+              <span class="audit-time">09:14</span>
+              <span class="audit-event">Request received from sarah.johnson@acmecorp.co.za</span>
+              <span class="audit-badge" style="background:var(--blue-dim);color:var(--blue)">Created</span>
+            </div>
+            <div class="audit-row">
+              <span class="audit-time">09:14</span>
+              <span class="audit-event">Reply with form link sent to requester</span>
+              <span class="audit-badge" style="background:var(--surface);color:var(--muted);border:1px solid var(--border)">Email sent</span>
+            </div>
+            <div class="audit-row">
+              <span class="audit-time">09:31</span>
+              <span class="audit-event">Form link opened by requester</span>
+              <span class="audit-badge" style="background:var(--amber-dim);color:var(--amber)">Viewed</span>
+            </div>
+            <div class="audit-row">
+              <span class="audit-time">09:34</span>
+              <span class="audit-event">Form submitted with all fields complete</span>
+              <span class="audit-badge" style="background:var(--green-dim);color:var(--green)">Submitted</span>
+            </div>
+            <div class="audit-row">
+              <span class="audit-time">09:34</span>
+              <span class="audit-event">Entra user created — eclark@acmecorp.co.za</span>
+              <span class="audit-badge" style="background:var(--purple-dim);color:var(--purple)">Provisioned</span>
+            </div>
+            <div class="audit-row">
+              <span class="audit-time">09:34</span>
+              <span class="audit-event">Credentials emailed to sarah.johnson@acmecorp.co.za</span>
+              <span class="audit-badge" style="background:var(--surface);color:var(--muted);border:1px solid var(--border)">Email sent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Request types ── -->
+  <section>
+    <div class="section-label">What it handles</div>
+    <h2>Types of tickets it can handle.</h2>
+    <p class="section-intro">
+      Claude recognises these request types automatically — no keywords, no subject line
+      formatting, no rules to maintain.
+    </p>
+
+    <div class="type-grid">
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#059669"></div>
+          <h4>New starter</h4>
+        </div>
+        <div class="fields">Name, start date, department, manager, job title, license, shared mailbox access, group memberships.</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#6b7280"></div>
+          <h4>Leaver</h4>
+        </div>
+        <div class="fields">Target user, leaving date, mailbox handling, forwarding address, delegate access.</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#7c3aed"></div>
+          <h4>Shared mailbox</h4>
+        </div>
+        <div class="fields">Target user, mailbox address, permission type (full access, send as, send on behalf).</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#d97706"></div>
+          <h4>Group / DL change</h4>
+        </div>
+        <div class="fields">Target user, group or distribution list name, action (add or remove).</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#1d5bbf"></div>
+          <h4>Access change</h4>
+        </div>
+        <div class="fields">Target user, system or resource, action (grant, modify, revoke), details.</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-top">
+          <div class="type-dot" style="background:#c0392b"></div>
+          <h4>MFA / password reset</h4>
+        </div>
+        <div class="fields">Target user, reset type (MFA, password, or both), details or reason.</div>
+        <div><span class="auto-tag" style="background:var(--green-dim);color:var(--green)">✓ One-click approval</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Who interacts ── -->
+  <section>
+    <div class="section-label">The people involved</div>
+    <h2>Three roles. Each with a clear part to play.</h2>
+    <p class="section-intro">
+      The client sends an email the way they always have. We get a complete ticket
+      ready to action. Access Hub handles everything in between.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+
+      <!-- Requester -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:20px 20px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:1.5rem;margin-bottom:10px;">👤</div>
+          <h4 style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;">The client</h4>
+          <p style="font-size:.8125rem;color:var(--muted);line-height:1.5;">
+            Sends a request by email as they normally would. Gets a pre-filled form link back,
+            fills in any missing details, and submits. No portal, no account, no training required.
+          </p>
+        </div>
+        <div style="padding:14px 20px;background:var(--surface);display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:4px;">They never need to</div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Log in to a portal
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Go back and forth with the helpdesk
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Follow up to chase progress
+          </div>
+        </div>
+      </div>
+
+      <!-- System -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:20px 20px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:1.5rem;margin-bottom:10px;">⚡</div>
+          <h4 style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;">Access Hub</h4>
+          <p style="font-size:.8125rem;color:var(--muted);line-height:1.5;">
+            Reads the email, identifies the request type, extracts every field it can find,
+            sends the form link, updates the ConnectWise ticket, and provisions or disables
+            accounts on approval. All automated, all logged.
+          </p>
+        </div>
+        <div style="padding:14px 20px;background:var(--surface);display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:4px;">Happens automatically</div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--ink2);align-items:flex-start;">
+            <span style="color:var(--green);flex-shrink:0;">✓</span> Email read &amp; classified
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--ink2);align-items:flex-start;">
+            <span style="color:var(--green);flex-shrink:0;">✓</span> Form sent to requester
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--ink2);align-items:flex-start;">
+            <span style="color:var(--green);flex-shrink:0;">✓</span> ConnectWise ticket updated
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--ink2);align-items:flex-start;">
+            <span style="color:var(--green);flex-shrink:0;">✓</span> Account provisioned on approval
+          </div>
+        </div>
+      </div>
+
+      <!-- Technician -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="padding:20px 20px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:1.5rem;margin-bottom:10px;">🛠️</div>
+          <h4 style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;">The technician</h4>
+          <p style="font-size:.8125rem;color:var(--muted);line-height:1.5;">
+            Gets notified of a ticket in ConnectWise. Reviews the details, clicks approve,
+            and it's done. No re-reading emails, no copy-pasting, no manual work.
+          </p>
+        </div>
+        <div style="padding:14px 20px;background:var(--surface);display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:4px;">They no longer need to</div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Chase missing information
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Find and copy admin credentials
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Manually create accounts
+          </div>
+          <div style="display:flex;gap:8px;font-size:.875rem;color:var(--muted);align-items:flex-start;">
+            <span style="color:var(--accent);flex-shrink:0;">✕</span> Email credentials to clients
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Stack & Deployment ── -->
+  <section>
+    <div class="section-label">Deployment</div>
+    <h2>How it's set up.</h2>
+    <p class="section-intro">
+      Hosted on Azure. Plugs into Microsoft 365, Entra, and ConnectWise.
+      One setup per client — once it's in, it runs on its own.
+    </p>
+
+    <!-- Flow diagram -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:40px;">
+
+      <!-- Row 1: Email in -->
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);text-align:right;padding-right:4px;">Email in</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">Client</span>
+            Plain-English email
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">Microsoft 365</span>
+            Service desk mailbox
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--accent-border);border-radius:8px;background:var(--accent-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:2px;">Access Hub</span>
+            Azure App Service
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: AI -->
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);text-align:right;padding-right:4px;">AI parsing</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:8px 14px;border:1px solid var(--accent-border);border-radius:8px;background:var(--accent-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:2px;">Access Hub</span>
+            Sends email body
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--purple-border);border-radius:8px;background:var(--purple-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);display:block;margin-bottom:2px;">Anthropic API</span>
+            Claude extracts fields
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--blue-border);border-radius:8px;background:var(--blue-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);display:block;margin-bottom:2px;">Azure PostgreSQL</span>
+            Structured data stored
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Form -->
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);text-align:right;padding-right:4px;">Form reply</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:8px 14px;border:1px solid var(--accent-border);border-radius:8px;background:var(--accent-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:2px;">Access Hub</span>
+            Generates form link
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">Microsoft Graph</span>
+            Reply sent from mailbox
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">Client</span>
+            Receives pre-filled link
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Ticket -->
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);text-align:right;padding-right:4px;">Ticket update</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:8px 14px;border:1px solid var(--accent-border);border-radius:8px;background:var(--accent-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:2px;">Access Hub</span>
+            On form submission
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">ConnectWise API</span>
+            Internal note + approval link
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Provisioning -->
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);text-align:right;padding-right:4px;">Provisioning</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--light);display:block;margin-bottom:2px;">Technician</span>
+            Clicks approve
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--accent-border);border-radius:8px;background:var(--accent-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:2px;">Access Hub</span>
+            Triggers provisioning
+          </div>
+          <div style="display:flex;align-items:center;color:var(--dim);font-size:1.2rem;">→</div>
+          <div style="padding:8px 14px;border:1px solid var(--green-border);border-radius:8px;background:var(--green-dim);font-size:.875rem;color:var(--ink2);">
+            <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);display:block;margin-bottom:2px;">Microsoft Entra</span>
+            Account created / disabled
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>Access Hub &mdash; Internal reference &mdash; April 2026</p>
+    <p>Tyler Stewart</p>
+  </footer>
+
+</div>
+</body>
+</html>
